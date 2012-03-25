@@ -30,7 +30,7 @@ class SklikApi
 end
 
 #including sklik-api
-["xmlrpc_setup",  "access", "connection", "sklik_object", "campaign"].each do |file|
+["xmlrpc_setup",  "access", "connection", "sklik_object", "client", "campaign"].each do |file|
   require File.join(File.dirname(__FILE__),"/sklik-api/#{file}.rb")
 end
 
