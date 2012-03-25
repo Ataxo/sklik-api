@@ -1,6 +1,10 @@
+
+
 # rcov generated
 coverage
 coverage.data
+
+log/*
 
 # rdoc generated
 rdoc
@@ -47,3 +51,6 @@ pkg
 
 # For rubinius:
 #*.rbc
+
+
+.rvmrc

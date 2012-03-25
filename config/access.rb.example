@@ -1,0 +1,8 @@
+# -*- encoding : utf-8 -*-
+
+### TEST ACCOUNT
+
+SklikApi::Access.set(
+    :email => "email@seznam.cz",
+    :password => "password"
+  )
