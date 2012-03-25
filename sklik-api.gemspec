@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
     "lib/sklik-api/connection.rb",
     "lib/sklik-api/sklik_object.rb",
     "lib/sklik-api/xmlrpc_setup.rb",
+    "sklik-api.gemspec",
     "test/fake_web.rb",
     "test/helper.rb",
     "test/unit/campaign.rb"
