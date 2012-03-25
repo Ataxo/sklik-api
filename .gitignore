@@ -54,3 +54,5 @@ pkg
 
 
 .rvmrc
+Gemfile.lock
+config/access.rb
