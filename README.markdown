@@ -13,6 +13,8 @@ gem "sklik-api", :require => "sklik-api"
 
 # Usage 
 
+Campaign creation
+
 ``` ruby
 campaign_hash = {
   :name => "name of your campaign",
@@ -58,7 +60,19 @@ SklikApi::Access.set(
 SklikApi::Campaign.new(campaign_hash).save
 ```
 
-== Contributing to sklik-api
+Update of Campaign
+
+``` ruby
+campaign = SklikApi::Campaign.find(:campaign_id => 12345, :customer_id => 12345).first #customer_id is optional
+campaign.args[:status] = :paused
+campaign.args[:name] = "Updated name of campaign"
+campaign.save
+#this will update status to paused and change campaign name
+```
+
+
+
+# Contributing to sklik-api
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
@@ -68,7 +82,7 @@ SklikApi::Campaign.new(campaign_hash).save
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+# Copyright
 
 Copyright (c) 2012 Ondrej Bartas. See LICENSE.txt for
 further details.
