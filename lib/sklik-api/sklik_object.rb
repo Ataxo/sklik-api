@@ -39,7 +39,16 @@ class SklikApi
       def args
         @args
       end
-
+      
+      def restore
+        connection.call("#{self.class::NAME}.restore", @args[:campaign_id] ) { |param| true }
+      end
+      
+      def remove
+        pp "REMOVING!: #{@args[:campaign_id]}"
+        connection.call("#{self.class::NAME}.remove", @args[:campaign_id] ) { |param| true }
+      end
+      
       def create
         out = connection.call("#{self.class::NAME}.create", *create_args ) { |param|
            param["#{self.class::NAME}Id".to_sym]
@@ -48,8 +57,18 @@ class SklikApi
         @args
       end
             
+      def update
+        pp "updating!!!"
+        pp update_args
+        out = connection.call("#{self.class::NAME}.setAttributes", *update_args ) { |param| true }
+      end
+      
       def create_args
         raise(NoMethodError, "Please implement 'create_args' method in class: #{self.class} - should return array which will be placed into create method")
+      end
+
+      def update_args
+        raise(NoMethodError, "Please implement 'update_args' method in class: #{self.class} - should return array which will be placed into update method")
       end
 
       def to_hash

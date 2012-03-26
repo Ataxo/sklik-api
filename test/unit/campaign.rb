@@ -84,11 +84,10 @@ class CampaignTest < Test::Unit::TestCase
         @campaign.save
       end
         
-      should "get current status" do
-        assert_equal @campaign.args[:status], :running
-      end
-      
-      should "be created with right parameters" do
+      should "be created with right parameters and updated" do
+        
+        assert_equal @campaign.args[:status], :running, "Must be running"
+        
         campaigns = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id])
         campaign_hash = campaigns.first.to_hash
         assert_equal campaign_hash[:campaign_id], @campaign.args[:campaign_id], "campaign id should be same"
@@ -96,8 +95,35 @@ class CampaignTest < Test::Unit::TestCase
         assert_equal campaign_hash[:budget].to_f, @test_campaign_hash[:budget].to_f, "budgets should be same"
         assert_equal campaign_hash[:name], @test_campaign_hash[:name], "campaign name should be same"
         assert_equal campaign_hash[:ad_groups].size, @test_campaign_hash[:ad_groups].size, "campaign ad_groups should have same count"
+        
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        new_name = "Test of updated campaign name- #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
+        campaign.args[:name] = new_name
+        campaign.save
+        campaign_hash = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first.to_hash
+        assert_equal campaign_hash[:name], new_name, "campaign name should be same"
+        
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        campaign.args[:status] = :paused
+        campaign.save
+        campaign_hash = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first.to_hash
+        assert_equal campaign_hash[:status], :paused, "campaign should be paused"
+        
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        campaign.args[:status] = :stopped
+        puts "STOPPINGGGGGG"
+        campaign.save
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert_equal campaign.args[:status], :stopped, "campaign should be stopped"
+
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        campaign.args[:status] = :paused
+        puts "PAUSINGGGGGGG"
+        campaign.save
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert_equal campaign.args[:status], :paused, "campaign should be paused"
+
       end
     end
-    
   end
 end

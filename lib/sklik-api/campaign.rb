@@ -64,6 +64,7 @@ Example of input hash
         if args[:campaign_id].nil? || (args[:campaign_id] && args[:campaign_id].to_i == campaign[:id].to_i)
           out << Campaign.new( 
             :campaign_id => campaign[:id],
+            :customer_id => args[:customer_id], 
             :budget => campaign[:dayBudget].to_f/100.0, 
             :name => campaign[:name], 
             :status => fix_status(campaign)
@@ -84,6 +85,16 @@ Example of input hash
         return :unknown
       end
     end
+
+    def status_for_update
+      if @args[:status] == :running
+        return "active"
+      elsif @args[:status] == :paused
+        return "suspend"
+      else
+        return nil
+      end
+    end
     
     def to_hash
       if @campaign_data
@@ -93,6 +104,23 @@ Example of input hash
         @campaign_data[:ad_groups] = Adgroup.find(self).collect{|a| a.to_hash}
         @campaign_data
       end
+    end
+    
+    def update_args
+      out = []
+
+      #add campaign id on which will be performed update
+      out << @args[:campaign_id]
+      
+      #prepare campaign struct
+      args = {}
+      args[:name] = @args[:name] if @args[:name]
+      args[:status] = status_for_update if status_for_update
+      args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
+      args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
+      out << args
+
+      out
     end
     
     def create_args
@@ -107,14 +135,37 @@ Example of input hash
       
       #add customer id on which account campaign should be created
       out << @customer_id if @customer_id
-      pp @customer_id
-      pp out
       out
+    end
+    
+    def self.get_current_status args = {}
+      raise ArgumentError, "Campaign_id is required" unless args[:campaign_id]
+      campaigns = self.find(args)
+      pp campaigns
+      if campaigns.size == 1
+        campaigns.first.args[:status]
+      else
+        raise ArgumentError, "Campaign by #{args.inspect} couldn't be found!"
+      end
+    end
+
+    def get_current_status
+      self.class.get_current_status :campaign_id => @args[:campaign_id], :customer_id => @customer_id
     end
 
     def save 
       if @args[:campaign_id]  #do update
+        #get current status of campaign
+        before_status = get_current_status
         
+        #restore campaign before update 
+        restore if before_status == :stopped
+        
+        #update campaign
+        update
+        
+        #remove it if new status is stopped or status doesn't changed and before it was stopped
+        remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
       else                    #do save
         #create campaign
         create
