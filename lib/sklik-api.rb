@@ -36,7 +36,8 @@ end
 
 #including config
 ["access"].each do |file|
-  require File.join(File.dirname(__FILE__),"../config/#{file}.rb")
+  file_name = File.join(File.dirname(__FILE__),"../config/#{file}.rb")
+  require file_name if File.exists?(file_name)
 end
 
 
