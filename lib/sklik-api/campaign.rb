@@ -153,6 +153,11 @@ Example of input hash
       self.class.get_current_status :campaign_id => @args[:campaign_id], :customer_id => @customer_id
     end
 
+    def update args = {}
+      @args.merge!(args)
+      save
+    end
+    
     def save 
       if @args[:campaign_id]  #do update
         #get current status of campaign
@@ -162,7 +167,7 @@ Example of input hash
         restore if before_status == :stopped
         
         #update campaign
-        update
+        update_object
         
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
@@ -174,6 +179,7 @@ Example of input hash
         @adgroups.each{ |adgroup| adgroup.save }
         
         @campaign_data = @args
+        return true
       end
     end
   end

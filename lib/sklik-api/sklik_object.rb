@@ -45,7 +45,6 @@ class SklikApi
       end
       
       def remove
-        pp "REMOVING!: #{@args[:campaign_id]}"
         connection.call("#{self.class::NAME}.remove", @args[:campaign_id] ) { |param| true }
       end
       
@@ -57,9 +56,7 @@ class SklikApi
         @args
       end
             
-      def update
-        pp "updating!!!"
-        pp update_args
+      def update_object
         out = connection.call("#{self.class::NAME}.setAttributes", *update_args ) { |param| true }
       end
       
