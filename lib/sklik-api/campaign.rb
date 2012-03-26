@@ -46,6 +46,9 @@ Example of input hash
       #variable where are saved current data from system
       @campaign_data = nil
       
+      #variable for storing errors
+      @errors = []
+      
       #initialize adgroups
       @adgroups = []
       if args[:ad_groups] && args[:ad_groups].size > 0
@@ -56,6 +59,10 @@ Example of input hash
       
       @customer_id = args[:customer_id]
       super args
+    end
+    
+    def errors
+      @errors 
     end
     
     def self.find args = {}
@@ -173,13 +180,29 @@ Example of input hash
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
       else                    #do save
         #create campaign
-        create
+        begin
+          create
+        rescue Exception => e
+          @errors << e.message
+          return false
+        end
         
-        #create adgroups
-        @adgroups.each{ |adgroup| adgroup.save }
+        begin
+          #create adgroups
+          @adgroups.each{ |adgroup| adgroup.save }
         
-        @campaign_data = @args
-        return true
+          @campaign_data = @args
+          raise ArgumentError, "Problem with creating campaign datas" unless @errors.size == 0
+          return true
+        rescue Exception => e
+          @errors << e.message
+          #update name
+          update :name => "#{@args[:name]} FAILED ON CREATION - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
+          #remove campaign
+          remove
+          #return false because error occured
+          return false
+        end
       end
     end
   end

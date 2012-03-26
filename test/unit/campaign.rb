@@ -81,7 +81,9 @@ class CampaignTest < Test::Unit::TestCase
     context "create" do
       setup do
         @campaign = SklikApi::Campaign.new(@test_campaign_hash)
-        @campaign.save
+        unless @campaign.save
+          puts "ERROR: \n #{@campaign.errors.join("\n")}"
+        end
       end
         
       should "be created with right parameters and updated" do

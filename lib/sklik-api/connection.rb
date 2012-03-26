@@ -62,18 +62,19 @@ class SklikApi
         if param[:status] == 200
           return yield(param)
         elsif param[:status] == 406
-          raise ArgumentError, "Sklik returned: #{param[:statusMessage]} \n #{args.inspect}"
+          raise ArgumentError, "Sklik returned: #{method}: #{param[:statusMessage]} #{args.inspect}"
         elsif param[:statusMessage] == "Session has expired or is malformed."
           raise ArgumentError, "session has expired"
         else
           raise ArgumentError, "There is error from sklik #{method}: #{param[:statusMessage]}"
         end
       rescue Exception => e
+        retry_count -= 1
         pp "Rescuing from request by: #{e.class} - #{e.message}"
         #if session expired then get new one! and retry
         get_session(true) if e.message == "session has expired"
-
-        retry_count -= 1
+        #don't retry if there is problem with Invalid paramaters od Data
+        retry_count = 0 if e.message.include?("Invalid") 
         retry if retry_count > 0
         raise e
       end

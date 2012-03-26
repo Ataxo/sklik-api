@@ -114,10 +114,38 @@ Example of input hash
         create
         
         #create adtexts
-        @adtexts.each{ |adtext| adtext.save }
+        @adtexts.each do |adtext| 
+          begin 
+            adtext.save
+          rescue Exception => e
+            #take care about error message -> do it nicer
+            if /There is error from sklik ad.create: Invalid parameters/ =~ e.message
+              @campaign.errors << "Problem with creating #{adtext.args} in adgroup #{@args[:name]}"
+            else
+              @campaign.errors << e.message
+            end
+          end
+        end
+          
         
         #create keywords
-        @keywords.each{ |keyword| keyword.save }
+        keywords_error = []
+        @keywords.each do |keyword| 
+          begin 
+            keyword.save
+          rescue Exception => e
+            #take care about error message -> do it nicer
+            if /Sklik returned: keyword.create: Invalid data in request/ =~ e.message 
+              keywords_error << e.message.split("{:name=>\"").last.split("\", :matchType").first
+            else
+              @campaign.errors << e.message
+            end
+          end
+        end
+        if keywords_error.size > 0
+          @campaign.errors << "Problem with creating keywords: #{keywords_error.join(", ")} in adgroup #{@args[:name]}"
+        end
+        
       end
     end
 
