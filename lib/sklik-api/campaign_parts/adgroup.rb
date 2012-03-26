@@ -57,7 +57,7 @@ Example of input hash
       out = []
       super(NAME, campaign.args[:campaign_id]).each do |adgroup|
         if args[:adgroup_id].nil? || (args[:adgroup_id] && args[:adgroup_id].to_i == adgroup[:id].to_i)
-          out << Adgroup.new( campaign, 
+          out << SklikApi::Adgroup.new( campaign, 
             :adgroup_id => adgroup[:id],
             :cpc => adgroup[:cpc].to_f/100.0, 
             :name => adgroup[:name], 

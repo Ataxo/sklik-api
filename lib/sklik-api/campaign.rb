@@ -69,7 +69,7 @@ Example of input hash
       out = []
       super(NAME, args[:customer_id]).each do |campaign|
         if args[:campaign_id].nil? || (args[:campaign_id] && args[:campaign_id].to_i == campaign[:id].to_i)
-          out << Campaign.new( 
+          out << SklikApi::Campaign.new( 
             :campaign_id => campaign[:id],
             :customer_id => args[:customer_id], 
             :budget => campaign[:dayBudget].to_f/100.0, 
@@ -178,6 +178,8 @@ Example of input hash
         
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
+        
+        return true
       else                    #do save
         #create campaign
         begin

@@ -50,7 +50,7 @@ Example of input hash
        out = []
        super(NAME, adgroup.args[:adgroup_id]).each do |adtext|
          if args[:adtext_id].nil? || (args[:adtext_id] && args[:adtext_id].to_i == adtext[:id].to_i)
-           out << Adtext.new( 
+           out << SklikApi::Adtext.new( 
              adgroup,
              :adtext_id => adtext[:id],
              :headline => adtext[:creative1],

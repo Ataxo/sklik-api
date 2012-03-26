@@ -66,7 +66,7 @@ class SklikApi
         elsif param[:statusMessage] == "Session has expired or is malformed."
           raise ArgumentError, "session has expired"
         else
-          raise ArgumentError, "There is error from sklik #{method}: #{param[:statusMessage]}"
+          raise ArgumentError, "There is error from sklik #{method}: #{param[:statusMessage]}: #{args.inspect}"
         end
       rescue Exception => e
         retry_count -= 1

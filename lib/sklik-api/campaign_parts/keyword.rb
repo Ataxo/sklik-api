@@ -63,7 +63,7 @@ Example of input hash
        out = []
        super(NAME, adgroup.args[:adgroup_id]).each do |keyword|
          if args[:keyword_id].nil? || (args[:keyword_id] && args[:keyword_id].to_i == keyword[:id].to_i)
-           out << Keyword.new( 
+           out << SklikApi::Keyword.new( 
              adgroup,
              :keyword_id => keyword[:id],
              :keyword => apply_math_type(keyword[:name], keyword[:matchType] ),
