@@ -81,6 +81,12 @@ Example of input hash
       out
     end
     
+    def self.list_search_services
+      connection.call("listSearchServices") do |param|
+        return param[:searchServices].collect{|c| c.symbolize_keys}
+      end      
+    end
+    
     def self.fix_status campaign
       if campaign[:removed] == true
         return :stopped
@@ -125,6 +131,8 @@ Example of input hash
       args[:status] = status_for_update if status_for_update
       args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
       args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
+      args[:excludedSearchServices] = @args[:excluded_search_services] if @args[:excluded_search_services]
+
       out << args
 
       out
@@ -138,6 +146,7 @@ Example of input hash
       args[:name] = @args[:name]
       args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
       args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
+      args[:excludedSearchServices] = @args[:excluded_search_services] if @args[:excluded_search_services]
       out << args
       
       #add customer id on which account campaign should be created

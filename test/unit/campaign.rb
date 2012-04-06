@@ -78,6 +78,17 @@ class CampaignTest < Test::Unit::TestCase
       assert_equal SklikApi::Campaign.find(:campaign_id => 123456789).size , 0
     end
     
+    should "return array of search services" do
+      assert_equal SklikApi::Campaign.list_search_services, [{:id=>1, :name=>"Vyhledávání na Seznam.cz"},
+               {:id=>2, :name=>"Firmy.cz"},
+               {:id=>3, :name=>"Sbazar.cz"},
+               {:id=>4, :name=>"Encyklopedie.Seznam.cz"},
+               {:id=>5, :name=>"Seznam na mobil (Smobil.cz)"},
+               {:id=>6, :name=>"Seznam Obrázky (Obrazky.cz)"},
+               {:id=>7, :name=>"Seznam Zboží (Zbozi.cz)"},
+               {:id=>8, :name=>"Partnerské vyhledávače"}]
+    end
+    
     context "create" do
       setup do
         @campaign = SklikApi::Campaign.new(@test_campaign_hash)

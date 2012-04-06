@@ -41,7 +41,14 @@ class SklikApi
       end
       
       def restore
-        connection.call("#{self.class::NAME}.restore", @args[:campaign_id] ) { |param| true }
+        begin 
+          connection.call("#{self.class::NAME}.restore", @args[:campaign_id] ) { |param| true }
+        rescue Exception => e
+          # if there is a problem but returned Not removed 
+          # return true, becasue it says it is restored
+          return true if e.message == "Rescuing from request by: ArgumentError - There is error from sklik campaign.restore: Not removed"
+          raise e
+        end
       end
       
       def remove

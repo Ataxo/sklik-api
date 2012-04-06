@@ -21,7 +21,11 @@ campaign_hash = {
   :cpc => 3.5, # cpc is in CZK and in float and is set for adgroup
   :budget => 15.4, # budget is in CZK and in float 
   :customer_id => 123456, #optional without specifying it will be created on logged account
-
+  
+  :excluded_search_services = [ # (optional) specify search services you don't want to use for your campaign
+    2,3
+  ],
+  
   :network_setting => {
     :content => true,
     :search => true
@@ -70,7 +74,12 @@ campaign.save
 #this will update status to paused and change campaign name
 ```
 
+Get all search services (for settings your campaigns)
 
+``` ruby
+pp SklikApi::Campaign.list_search_services
+#
+```
 
 # Contributing to sklik-api
  
