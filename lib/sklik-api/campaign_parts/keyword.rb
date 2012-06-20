@@ -92,7 +92,7 @@ Example of input hash
       if @keyword_data
         @keyword_data
       else
-        @keyword_data = @args[:keyword]
+        @keyword_data = {:keyword => @args[:keyword], :status => @args[:status]}
       end
     end
     

@@ -10,7 +10,7 @@ class CampaignTest < Test::Unit::TestCase
         :cpc => 3.5,
         :budget => 15.0,
         :customer_id => 192495,
-
+        :excluded_search_services => [2,3,4,5,6,7,8], #choose only seznam.cz
         :network_setting => {
           :content => true,
           :search => true
@@ -97,6 +97,16 @@ class CampaignTest < Test::Unit::TestCase
         end
       end
         
+      should "return valid to_hash" do
+        campaigns = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id])
+        assert_equal campaigns.size, 1, "Find should return array containing one campaign"
+        campaign = campaigns.first
+        campaign_hash = campaign.to_hash
+        assert_equal campaign_hash[:ad_groups].size, @test_campaign_hash[:ad_groups].size, "Campaign should have right adgroup count"
+        assert_equal campaign_hash[:ad_groups].inject(0){|i,o| i + o[:keywords].size}, @test_campaign_hash[:ad_groups].inject(0){|i,o| i + o[:keywords].size}, "Campaign should have right keywords count"
+        assert_equal campaign_hash[:ad_groups].inject(0){|i,o| i + o[:ads].size}, @test_campaign_hash[:ad_groups].inject(0){|i,o| i + o[:ads].size}, "Campaign should have right ads count"
+      end
+
       should "be created with right parameters and updated" do
         
         assert_equal @campaign.args[:status], :running, "Must be running"
