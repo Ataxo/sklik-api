@@ -49,7 +49,7 @@ class CampaignTest < Test::Unit::TestCase
             :keywords => [
               "\"some funny keyword\"",
               "[myphrase keyword]",
-              "mybroad keyword for me",
+              "-negative broad keyword",
               "test of diarcritics âô",
               "dokonalý kw"
             ]
@@ -113,6 +113,7 @@ class CampaignTest < Test::Unit::TestCase
         
         campaigns = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id])
         campaign_hash = campaigns.first.to_hash
+
         assert_equal campaign_hash[:campaign_id], @campaign.args[:campaign_id], "campaign id should be same"
         assert_equal campaign_hash[:status], :running , "campaign should be running"
         assert_equal campaign_hash[:budget].to_f, @test_campaign_hash[:budget].to_f, "budgets should be same"

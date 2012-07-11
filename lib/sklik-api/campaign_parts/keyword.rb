@@ -37,14 +37,20 @@ Example of input hash
     end
     
     def strip_match_type keyword
-      keyword.gsub(/(\[|\]|\")/, "")
+      keyword.gsub(/(\[|\]|\")/, "").gsub(/^-/, "")
     end
     
     def get_math_type keyword
-      if /^\[.*\]$/  =~ keyword 
+      if /^-\[.*\]$/  =~ keyword 
+        return "negativeExact"
+      elsif /^\[.*\]$/  =~ keyword 
         return "exact"
+      elsif /^-\".*\"$/  =~ keyword 
+        return "negativePhrase"
       elsif /^\".*\"$/  =~ keyword 
         return "phrase"
+      elsif /^-.*$/  =~ keyword 
+        return "negativeBroad"
       else
         return "broad"
       end
@@ -55,6 +61,9 @@ Example of input hash
       when "broad" then keyword
       when "phrase" then "\"#{keyword}\""
       when "exact" then "[#{keyword}]"
+      when "negativeBroad" then "-#{keyword}"
+      when "negativePhrase" then "-\"#{keyword}\""
+      when "negativeExact" then "-[#{keyword}]"
       else keyword
       end
     end
