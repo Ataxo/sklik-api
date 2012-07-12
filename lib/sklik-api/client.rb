@@ -16,7 +16,13 @@ class SklikApi
           u.symbolize_keys!
           SklikApi::Client.new(
             :customer_id => u[:userId],
-            :email => u[:username]
+            :email => u[:username],
+            :agency_status => u[:agencyStatus],
+            :wallet_credit => u[:walletCredit],
+            :wallet_credit_with_vat => u[:walletCreditWithVat],
+            :wallet_verified => u[:walletVerified],
+            :day_budget_sum => u[:dayBudgetSum],
+            :account_limit => u[:accountLimit]
           )
         }
       }
