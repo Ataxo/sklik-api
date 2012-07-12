@@ -76,6 +76,25 @@ Example of input hash
       end
     end
     
+    def keywords_stats from, to
+      output = []
+      keywords = Keyword.find(self)
+      keywords.in_groups_of(100, false).each do |keywords_group|
+        out = connection.call("keywords.stats", keywords_group.collect{|k| k.args[:keyword_id]}, from, to ) { |param|
+          param[:keywordStats]
+        }
+        out.each do |kw_stats|
+          kws = keywords_group.select{|k| k.args[:keyword_id] == kw_stats["keywordId"]}
+          if kws.size == 1
+            kw = keywords_group.delete(kws.first)
+            kw.stats = {:fulltext => underscore_hash_keys(kw_stats["stats"]) }
+            output << kw
+          end
+        end
+      end
+      output
+    end
+
     def to_hash
       if @adgroup_data
         @adgroup_data

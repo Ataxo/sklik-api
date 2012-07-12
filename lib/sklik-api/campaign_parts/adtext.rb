@@ -78,7 +78,7 @@ Example of input hash
        end
      end
 
-     def to_hash
+    def to_hash
       if @adtext_data
         @adtext_data
       else

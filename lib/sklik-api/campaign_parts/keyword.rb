@@ -69,35 +69,35 @@ Example of input hash
     end
     
     def self.find adgroup, args = {}
-       out = []
-       super(NAME, adgroup.args[:adgroup_id]).each do |keyword|
-         if args[:keyword_id].nil? || (args[:keyword_id] && args[:keyword_id].to_i == keyword[:id].to_i)
-           out << SklikApi::Keyword.new( 
-             adgroup,
-             :keyword_id => keyword[:id],
-             :keyword => apply_math_type(keyword[:name], keyword[:matchType] ),
-             :status => fix_status(keyword)
-           )
-         end
-       end
-       out
-     end
+      out = []
+      super(NAME, adgroup.args[:adgroup_id]).each do |keyword|
+        if args[:keyword_id].nil? || (args[:keyword_id] && args[:keyword_id].to_i == keyword[:id].to_i)
+          out << SklikApi::Keyword.new( 
+            adgroup,
+            :keyword_id => keyword[:id],
+            :keyword => apply_math_type(keyword[:name], keyword[:matchType] ),
+            :status => fix_status(keyword)
+          )
+        end
+      end
+      out
+    end
 
-     def self.fix_status keyword
-       if keyword[:removed] == true
-         return :stopped
-       elsif keyword[:status] == "active"
-         return :running
-       elsif keyword[:status] == "suspend"
-         return :paused
-       elsif keyword[:status] == "nonactive"
-         return :paused_by_low_cpc
-       else
-         return :unknown
-       end
-     end
+    def self.fix_status keyword
+      if keyword[:removed] == true
+        return :stopped
+      elsif keyword[:status] == "active"
+        return :running
+      elsif keyword[:status] == "suspend"
+        return :paused
+      elsif keyword[:status] == "nonactive"
+        return :paused_by_low_cpc
+      else
+        return :unknown
+      end
+    end
 
-     def to_hash
+    def to_hash
       if @keyword_data
         @keyword_data
       else

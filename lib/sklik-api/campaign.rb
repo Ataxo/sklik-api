@@ -68,7 +68,8 @@ Example of input hash
     def self.find args = {}
       out = []
       super(NAME, args[:customer_id]).each do |campaign|
-        if args[:campaign_id].nil? || (args[:campaign_id] && args[:campaign_id].to_i == campaign[:id].to_i)
+        if (args[:campaign_id].nil? || (args[:campaign_id] && args[:campaign_id].to_i == campaign[:id].to_i)) && #find by campaign id
+          (args[:status].nil? || (args[:status] && args[:status] == fix_status(campaign))) # find by status
           out << SklikApi::Campaign.new( 
             :campaign_id => campaign[:id],
             :customer_id => args[:customer_id], 
@@ -109,6 +110,10 @@ Example of input hash
       end
     end
     
+    def adgroups
+      Adgroup.find(self)
+    end
+
     def to_hash
       if @campaign_data
         @campaign_data
@@ -173,7 +178,7 @@ Example of input hash
       @args.merge!(args)
       save
     end
-    
+
     def save 
       if @args[:campaign_id]  #do update
         #get current status of campaign

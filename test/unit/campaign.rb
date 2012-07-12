@@ -70,6 +70,12 @@ class CampaignTest < Test::Unit::TestCase
       assert SklikApi::Campaign.find(:customer_id => 192495).size > 0
     end
     
+    should "return stats" do
+      assert_nothing_raised do
+        SklikApi::Campaign.find(:campaign_id => 390265).first.get_stats Date.today, Date.today
+      end
+    end
+
     should "have hash stored inside" do
       assert_equal @campaign.args, @test_campaign_hash 
     end

@@ -62,6 +62,20 @@ class SklikApi
         @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] = out
         @args
       end
+
+      def stats= item
+        @stats = item
+      end
+
+      def stats
+        @stats ||= {}
+      end
+      
+      def get_stats from, to
+        @stats ||= connection.call("#{self.class::NAME}.stats", @args["#{self.class.name.to_s.split("::").last.underscore}_id".to_sym], from, to ) { |param|
+           {:fulltext => underscore_hash_keys(param[:fulltext]), :context => underscore_hash_keys(param[:context]) }
+        }
+      end
             
       def update_object
         out = connection.call("#{self.class::NAME}.setAttributes", *update_args ) { |param| true }
@@ -77,6 +91,10 @@ class SklikApi
 
       def to_hash
         raise(NoMethodError, "Please implement 'to_hash' method in class: #{self.class} - should return hash which contains all data")
+      end
+
+      def underscore_hash_keys hash
+        hash.inject({ }) { |x, (k,v)| x[k.underscore.to_sym] = v; x }
       end
     end
   end
