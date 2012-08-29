@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ondrej Bartas"]
-  s.date = "2012-07-12"
+  s.date = "2012-08-29"
   s.description = "Sklik advertising PPC api for creating campaigns and updating them when they runs"
   s.email = "ondrej@bartas.cz"
   s.extra_rdoc_files = [
@@ -51,10 +51,10 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<json>, [">= 0"])
-      s.add_runtime_dependency(%q<unicode>, ["~> 0.4.0"])
-      s.add_runtime_dependency(%q<text>, ["~> 0.2.0"])
-      s.add_runtime_dependency(%q<i18n>, ["~> 0.6.0"])
-      s.add_runtime_dependency(%q<activesupport>, ["~> 3.1.0"])
+      s.add_runtime_dependency(%q<unicode>, [">= 0"])
+      s.add_runtime_dependency(%q<text>, [">= 0"])
+      s.add_runtime_dependency(%q<i18n>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 0"])
       s.add_development_dependency(%q<rack-test>, [">= 0"])
       s.add_development_dependency(%q<shoulda-context>, [">= 0"])
       s.add_development_dependency(%q<turn>, ["~> 0.8.2"])
@@ -67,10 +67,10 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rcov>, ["= 0.9.10"])
     else
       s.add_dependency(%q<json>, [">= 0"])
-      s.add_dependency(%q<unicode>, ["~> 0.4.0"])
-      s.add_dependency(%q<text>, ["~> 0.2.0"])
-      s.add_dependency(%q<i18n>, ["~> 0.6.0"])
-      s.add_dependency(%q<activesupport>, ["~> 3.1.0"])
+      s.add_dependency(%q<unicode>, [">= 0"])
+      s.add_dependency(%q<text>, [">= 0"])
+      s.add_dependency(%q<i18n>, [">= 0"])
+      s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<rack-test>, [">= 0"])
       s.add_dependency(%q<shoulda-context>, [">= 0"])
       s.add_dependency(%q<turn>, ["~> 0.8.2"])
@@ -84,10 +84,10 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<json>, [">= 0"])
-    s.add_dependency(%q<unicode>, ["~> 0.4.0"])
-    s.add_dependency(%q<text>, ["~> 0.2.0"])
-    s.add_dependency(%q<i18n>, ["~> 0.6.0"])
-    s.add_dependency(%q<activesupport>, ["~> 3.1.0"])
+    s.add_dependency(%q<unicode>, [">= 0"])
+    s.add_dependency(%q<text>, [">= 0"])
+    s.add_dependency(%q<i18n>, [">= 0"])
+    s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<rack-test>, [">= 0"])
     s.add_dependency(%q<shoulda-context>, [">= 0"])
     s.add_dependency(%q<turn>, ["~> 0.8.2"])

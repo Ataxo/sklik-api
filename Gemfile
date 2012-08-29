@@ -1,10 +1,10 @@
 source "http://rubygems.org"
 
 gem "json"
-gem "unicode", "~> 0.4.0"
-gem "text", "~> 0.2.0"
-gem "i18n", "~> 0.6.0"
-gem "activesupport", "~> 3.1.0"
+gem "unicode"
+gem "text"
+gem "i18n"
+gem "activesupport"
 
 
 group :development do
