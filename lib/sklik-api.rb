@@ -15,7 +15,6 @@ require 'active_support'
 require 'active_support/inflector'
 require 'active_support/inflector/inflections'
 require 'active_support/core_ext/hash/keys'
-require 'active_support/core_ext/class/inheritable_attributes'
 require 'active_support/core_ext'
 
 require 'date'
