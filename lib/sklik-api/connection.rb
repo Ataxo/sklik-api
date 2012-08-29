@@ -18,7 +18,8 @@ class SklikApi
     
     #prepare connection to sklik
     def connection
-      server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => "/RPC2", :port => 443, :use_ssl => true, :timeout => @args[:timeout])
+      path = (ENV['RACK_ENV'] || ENV['RAILS']) == "test" ? "/sandbox/RPC2" : "/RPC2"
+      server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
       server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
       #fix of UTF-8 encoding
       server.extend(XMLRPCWorkAround)
@@ -59,7 +60,7 @@ class SklikApi
       begin 
         #get response from sklik
         param = connection.call( method, get_session, *args ).symbolize_keys
-        if param[:status] == 200
+        if [200,404].include?(param[:status])
           return yield(param)
         elsif param[:status] == 406
           raise ArgumentError, "Sklik returned: #{method}: #{param[:statusMessage]} #{args.inspect}"
