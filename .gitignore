@@ -49,6 +49,8 @@ pkg
 # For redcar:
 #.redcar
 
+my_client.rb
+
 # For rubinius:
 #*.rbc
 

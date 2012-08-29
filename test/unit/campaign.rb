@@ -66,8 +66,7 @@ class CampaignTest < Test::Unit::TestCase
     end
     
     should "be found" do 
-      assert_equal SklikApi::Campaign.find(:campaign_id => 390265).size, 1
-      assert SklikApi::Campaign.find(:customer_id => 192495).size > 0
+      assert SklikApi::Campaign.find().size > 0, "In sklik sandbox should be some campaigns"
     end
     
     should "return stats" do
