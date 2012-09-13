@@ -112,7 +112,7 @@ class CampaignTest < Test::Unit::TestCase
         assert_equal campaign_hash[:ad_groups].inject(0){|i,o| i + o[:ads].size}, @test_campaign_hash[:ad_groups].inject(0){|i,o| i + o[:ads].size}, "Campaign should have right ads count"
       end
 
-      should "be created with right parameters and updated" do
+      should "be created with right parameters" do
         
         assert_equal @campaign.args[:status], :running, "Must be running"
         
@@ -124,7 +124,9 @@ class CampaignTest < Test::Unit::TestCase
         assert_equal campaign_hash[:budget].to_f, @test_campaign_hash[:budget].to_f, "budgets should be same"
         assert_equal campaign_hash[:name], @test_campaign_hash[:name], "campaign name should be same"
         assert_equal campaign_hash[:ad_groups].size, @test_campaign_hash[:ad_groups].size, "campaign ad_groups should have same count"
-        
+      end
+
+      should "be created and updated by changing arguments" do
         campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
         new_name = "Test of updated campaign name- #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
         campaign.args[:name] = new_name
@@ -140,19 +142,39 @@ class CampaignTest < Test::Unit::TestCase
         
         campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
         campaign.args[:status] = :stopped
-        puts "STOPPINGGGGGG"
         campaign.save
         campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
         assert_equal campaign.args[:status], :stopped, "campaign should be stopped"
 
         campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
         campaign.args[:status] = :paused
-        puts "PAUSINGGGGGGG"
         campaign.save
         campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
         assert_equal campaign.args[:status], :paused, "campaign should be paused"
-
       end
+
+      should "be created and updated by update method" do
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        new_name = "Test of updated campaign name- #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
+        assert campaign.update(name: new_name), "Should update name"
+        campaign_hash = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first.to_hash
+        assert_equal campaign_hash[:name], new_name, "campaign name should be same"
+        
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert campaign.update(status: :paused), "should update status to paused"
+        campaign_hash = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first.to_hash
+        assert_equal campaign_hash[:status], :paused, "campaign should be paused"
+        
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert campaign.update(status: :stopped), "should update status to stopped"
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert_equal campaign.args[:status], :stopped, "campaign should be stopped"
+
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert campaign.update(status: :paused), "should update status to paused"
+        campaign = SklikApi::Campaign.find(:customer_id => @campaign.args[:customer_id], :campaign_id => @campaign.args[:campaign_id]).first
+        assert_equal campaign.args[:status], :paused, "campaign should be paused"
+      end     
     end
   end
 end
