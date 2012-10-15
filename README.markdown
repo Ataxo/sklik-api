@@ -53,6 +53,12 @@ campaign_hash = {
   ]
 }
 
+# This model also support additional params: 
+# :excluded_search_services, :excluded_urls, :total_budget, :total_clicks, 
+#  :ad_selection, :start_date, :end_date, :status, :premise_id 
+# Please look into documentation of api.sklik.cz
+# http://api.sklik.cz/campaign.create.html
+
 #you can set it before every action to sklik api, if you have multiple accounts :-)
 SklikApi::Access.set(
   :email => "your_email@seznam.cz",

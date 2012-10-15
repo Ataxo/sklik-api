@@ -4,6 +4,11 @@ class SklikApi
 
     NAME = "campaign"
 
+    ADDITIONAL_FIELDS = [ 
+      :excludedSearchServices, :excludedUrls, :totalBudget, :totalClicks, 
+      :adSelection, :startDate, :endDate, :premiseId 
+    ]
+
     include Object
 =begin
 Example of input hash
@@ -40,6 +45,12 @@ Example of input hash
     }
   ]
 }
+
+# This model also support additional params: 
+# :excluded_search_services, :excluded_urls, :total_budget, :total_clicks, 
+#  :ad_selection, :start_date, :end_date, :status, :premise_id 
+# Please look into documentation of api.sklik.cz
+# http://api.sklik.cz/campaign.create.html
 =end
     
     def initialize args
@@ -136,7 +147,10 @@ Example of input hash
       args[:status] = status_for_update if status_for_update
       args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
       args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
-      args[:excludedSearchServices] = @args[:excluded_search_services] if @args[:excluded_search_services]
+      ADDITIONAL_FIELDS.each do |add_info|
+        field_name = add_info.to_s.underscore.to_sym
+        args[add_info] = @args[field_name] if @args[field_name]
+      end
 
       out << args
 
@@ -151,7 +165,11 @@ Example of input hash
       args[:name] = @args[:name]
       args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
       args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
-      args[:excludedSearchServices] = @args[:excluded_search_services] if @args[:excluded_search_services]
+      ADDITIONAL_FIELDS.each do |add_info|
+        field_name = add_info.to_s.underscore.to_sym
+        args[add_info] = @args[field_name] if @args[field_name]
+      end
+
       out << args
       
       #add customer id on which account campaign should be created

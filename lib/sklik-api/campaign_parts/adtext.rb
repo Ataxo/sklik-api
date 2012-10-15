@@ -4,6 +4,10 @@ class SklikApi
 
     NAME = "ad"
 
+    ADDITIONAL_FIELDS = [ 
+      :premiseMode, :premiseID
+    ]
+
     include Object
 =begin
 Example of input hash
@@ -40,6 +44,12 @@ Example of input hash
       args[:creative3] = @args[:description2]
       args[:clickthruText] = @args[:display_url]
       args[:clickthruUrl] = @args[:url]
+
+      ADDITIONAL_FIELDS.each do |add_info|
+        field_name = add_info.to_s.underscore.to_sym
+        args[add_info] = @args[field_name] if @args[field_name]
+      end
+
       out << args
       
       #return output
