@@ -4,7 +4,7 @@ class SklikApi
 
     NAME = "ad"
 
-    ADDITIONAL_FIELDS = [ 
+    ADDITIONAL_FIELDS = [
       :premiseMode, :premiseID
     ]
 
@@ -26,17 +26,20 @@ Example of input hash
       @adtext_data = nil
       #set adtext owner adgroup
       @adgroup = adgroup
-      
+
       super args
     end
-      
-      
+
+    def uniq_identifier
+      "#{@args[:headline]}#{@args[:description1]}#{@args[:description2]}#{@args[:display_url]}#{@args[:url]}"
+    end
+
     def create_args
       raise ArgumentError, "Adtexts need's to know adgroup_id" unless @adgroup.args[:adgroup_id]
       out = []
       #add campaign id to know where to create adgroup
-      out << @adgroup.args[:adgroup_id] 
-      
+      out << @adgroup.args[:adgroup_id]
+
       #add adtext struct
       args = {}
       args[:creative1] = @args[:headline]
@@ -51,16 +54,16 @@ Example of input hash
       end
 
       out << args
-      
+
       #return output
       out
     end
-    
+
     def self.find adgroup, args = {}
        out = []
        super(NAME, adgroup.args[:adgroup_id]).each do |adtext|
          if args[:adtext_id].nil? || (args[:adtext_id] && args[:adtext_id].to_i == adtext[:id].to_i)
-           out << SklikApi::Adtext.new( 
+           out << SklikApi::Adtext.new(
              adgroup,
              :adtext_id => adtext[:id],
              :headline => adtext[:creative1],
@@ -68,7 +71,7 @@ Example of input hash
              :description2 => adtext[:creative3],
              :display_url =>adtext[:clickthruText],
              :url => adtext[:clickthruUrl],
-             :name => adtext[:name], 
+             :name => adtext[:name],
              :status => fix_status(adtext)
            )
          end
@@ -95,15 +98,15 @@ Example of input hash
         @adtext_data = @args
       end
     end
-    
-    def save 
+
+    def save
       if @args[:adtext_id]  #do update
-        
+
       else                    #do save
         #create adtext
-        create        
+        create
       end
     end
   end
 end
-      
+

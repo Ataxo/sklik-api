@@ -194,6 +194,16 @@ Example of input hash
 
     def update args = {}
       @args.merge!(args)
+
+      #initialize update of adgroups adgroups
+      @adgroups = []
+      if args[:ad_groups] && args[:ad_groups].size > 0
+        @adgroups_update = true
+        args[:ad_groups].each do |adgroup|
+          @adgroups << SklikApi::Adgroup.new(self, adgroup)
+        end
+      end
+
       save
     end
 
@@ -210,15 +220,44 @@ Example of input hash
         begin
           #update campaign
           update_object
+
+          #update adgroups!
+          if @adgroups_update
+            @saved_adgroups = adgroups.inject({}){|o,a| o[a.args[:name]] = a; o}
+            @new_adgroups = @adgroups.inject({}){|o,a| o[a.args[:name]] = a; o}
+            #adgroups to be deleted
+            (@saved_adgroups.keys - @new_adgroups.keys).each do |k|
+              #don't try to remove already removed adgroup
+              unless @saved_adgroups[k].args[:status] == :stopped
+                puts "removing old adgroup: #{@saved_adgroups[k].args[:name]}"
+                @saved_adgroups[k].remove
+              end
+            end
+
+            #adgroups to be created
+            (@new_adgroups.keys - @saved_adgroups.keys).each do |k|
+              puts "creating new adgroup: #{@new_adgroups[k].args[:name]}"
+              @new_adgroups[k].save
+            end
+
+            #check status to be running
+            (@new_adgroups.keys & @saved_adgroups.keys).each do |k|
+              puts "checking status of adgroup: #{@saved_adgroups[k].args[:name]}"
+              if @saved_adgroups[k].args[:status] == :stopped
+                @saved_adgroups[k].restore
+              end
+              puts "updating adgroup: #{@saved_adgroups[k].args[:name]}"
+              @saved_adgroups[k].update @new_adgroups[k]
+            end
+
+          end
+
         rescue Exception => e
-          error = e
+          @errors << e.message
         end
 
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
-
-        #raise error when something went wrong
-        raise error if error
 
         return true
       else                    #do save
