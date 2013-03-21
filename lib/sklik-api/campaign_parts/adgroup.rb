@@ -174,39 +174,21 @@ Example of input hash
         ############
         ## KEYWORDS
         ############
-        #create new keyowrds and delete old
-        @saved_keywords = keywords.inject({}){|o,k| o[k.args[:keyword]] = k ; o}
-        @new_keywords = @keywords.inject({}){|o,k| o[k.args[:keyword]] = k ; o}
 
-        #keywords to be deleted
-        (@saved_keywords.keys - @new_keywords.keys).each do |k|
-          puts "deleting keyword #{@saved_keywords[k]} in #{@args[:name]}"
-          #don't try to remove already removed keyword
-          @saved_keywords[k].remove unless @saved_keywords[k].args[:status] == :stopped
-        end
-
-        #keywords to be created
+        #update keywords
         keywords_error = []
-        (@new_keywords.keys - @saved_keywords.keys).each do |k|
-          puts "creating new keyword #{k} in #{@args[:name]}"
+        @new_keywords = @keywords.clone
+        delete_first = true
+        while @new_keywords && @new_keywords.size > 0 do
           begin
-            @new_keywords[k].save
-          rescue Exception => e
-            #take care about error message -> do it nicer
-            if /Sklik returned: keyword.create: Invalid data in request/ =~ e.message
-              keywords_error << e.message.split("{:name=>\"").last.split("\", :matchType").first
-            else
-              @campaign.errors << e.message
+            connection.call('keywords.set', @args[:adgroup_id], @new_keywords[0..199].collect{|k| k.create_args.last }, delete_first) do |params|
+              @campaign.errors << params[:statusMessage] if params[:statusMessage] != "OK"
             end
+          rescue Exception => e
+            @campaign.errors << e.message
           end
-        end
-        if keywords_error.size > 0
-          @campaign.errors << "Problem with creating keywords: #{keywords_error.join(", ")} in adgroup #{@args[:name]}"
-        end
-
-        #check status to be running
-        (@new_keywords.keys & @saved_keywords.keys).each do |k|
-          @saved_keywords[k].restore if @saved_keywords[k].args[:status] == :stopped
+          @new_keywords = @new_keywords[200..-1]
+          delete_first = false
         end
 
         ############
@@ -266,18 +248,20 @@ Example of input hash
 
         #create keywords
         keywords_error = []
-        @keywords.each do |keyword|
+        @new_keywords = @keywords.clone
+        delete_first = true
+        while @new_keywords && @new_keywords.size > 0 do
           begin
-            keyword.save
-          rescue Exception => e
-            #take care about error message -> do it nicer
-            if /Sklik returned: keyword.create: Invalid data in request/ =~ e.message
-              keywords_error << e.message.split("{:name=>\"").last.split("\", :matchType").first
-            else
-              @campaign.errors << e.message
+            connection.call('keywords.set', @args[:adgroup_id], @new_keywords[0..199].collect{|k| k.create_args.last }, delete_first) do |params|
+              @campaign.errors << params[:statusMessage] if params[:statusMessage] != "OK"
             end
+          rescue Exception => e
+            @campaign.errors << e.message
           end
+          @new_keywords = @new_keywords[200..-1]
+          delete_first = false
         end
+
         if keywords_error.size > 0
           @campaign.errors << "Problem with creating keywords: #{keywords_error.join(", ")} in adgroup #{@args[:name]}"
         end
