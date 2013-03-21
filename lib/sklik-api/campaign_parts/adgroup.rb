@@ -100,8 +100,13 @@ Example of input hash
         @adgroup_data
       else
         @adgroup_data = @args
-        @adgroup_data[:ads] = Adtext.find(self).collect{|a| a.to_hash}
-        @adgroup_data[:keywords] = Keyword.find(self).collect{|k| k.to_hash}
+        if @args[:status] != :stopped
+          @adgroup_data[:ads] = Adtext.find(self).collect{|a| a.to_hash}
+          @adgroup_data[:keywords] = Keyword.find(self).collect{|k| k.to_hash}
+        else
+          @adgroup_data[:ads] = []
+          @adgroup_data[:keywords] = []
+        end
         @adgroup_data
       end
     end
@@ -175,7 +180,7 @@ Example of input hash
 
         #keywords to be deleted
         (@saved_keywords.keys - @new_keywords.keys).each do |k|
-          puts "deleting keyword #{k} in #{@args[:name]}"
+          puts "deleting keyword #{@saved_keywords[k]} in #{@args[:name]}"
           #don't try to remove already removed keyword
           @saved_keywords[k].remove unless @saved_keywords[k].args[:status] == :stopped
         end
@@ -214,7 +219,7 @@ Example of input hash
 
         #adtexts to be deleted
         (@saved_adtexts.keys - @new_adtexts.keys).each do |k|
-          puts "deleting keyword #{k} in #{@args[:name]}"
+          puts "deleting adtext #{@saved_adtexts[k]} in #{@args[:name]}"
           #don't try to remove already removed adtext
           @saved_adtexts[k].remove  unless @saved_adtexts[k].args[:status] == :stopped
         end

@@ -130,7 +130,11 @@ Example of input hash
         @campaign_data
       else
         @campaign_data = @args
-        @campaign_data[:ad_groups] = Adgroup.find(self).collect{|a| a.to_hash}
+        if @args[:status] != :stopped
+          @campaign_data[:ad_groups] = Adgroup.find(self).collect{|a| a.to_hash}
+        else
+          @campaign_data[:ad_groups] = []
+        end
         @campaign_data
       end
     end
@@ -259,7 +263,7 @@ Example of input hash
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
 
-        raise ArgumentError, "Problem with updating campaign datas" unless @errors.size == 0
+        raise ArgumentError, "Problem with updating campaign datas #{@errors}" unless @errors.size == 0
 
         return true
       else                    #do save
