@@ -180,8 +180,21 @@ Example of input hash
         end
 
         #keywords to be created
+        keywords_error = []
         (@new_keywords.keys - @saved_keywords.keys).each do |k|
-          @new_keywords[k].save
+          begin
+            @new_keywords[k].save
+          rescue Exception => e
+            #take care about error message -> do it nicer
+            if /Sklik returned: keyword.create: Invalid data in request/ =~ e.message
+              keywords_error << e.message.split("{:name=>\"").last.split("\", :matchType").first
+            else
+              @campaign.errors << e.message
+            end
+          end
+        end
+        if keywords_error.size > 0
+          @campaign.errors << "Problem with creating keywords: #{keywords_error.join(", ")} in adgroup #{@args[:name]}"
         end
 
         #check status to be running
@@ -205,7 +218,16 @@ Example of input hash
 
         #adtexts to be created
         (@new_adtexts.keys - @saved_adtexts.keys).each do |k|
-          @new_adtexts[k].save
+          begin
+            @new_adtexts[k].save
+          rescue Exception => e
+            #take care about error message -> do it nicer
+            if /There is error from sklik ad.create: Invalid parameters/ =~ e.message
+              @campaign.errors << "Problem with creating #{@new_adtexts[k].args} in adgroup #{@args[:name]}"
+            else
+              @campaign.errors << e.message
+            end
+          end
         end
 
         #check status to be running
