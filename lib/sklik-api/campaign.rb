@@ -259,6 +259,8 @@ Example of input hash
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
 
+        raise ArgumentError, "Problem with updating campaign datas" unless @errors.size == 0
+
         return true
       else                    #do save
         #create campaign
