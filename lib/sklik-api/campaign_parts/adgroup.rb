@@ -175,6 +175,7 @@ Example of input hash
 
         #keywords to be deleted
         (@saved_keywords.keys - @new_keywords.keys).each do |k|
+          puts "deleting keyword #{k} in #{@args[:name]}"
           #don't try to remove already removed keyword
           @saved_keywords[k].remove unless @saved_keywords[k].args[:status] == :stopped
         end
@@ -182,6 +183,7 @@ Example of input hash
         #keywords to be created
         keywords_error = []
         (@new_keywords.keys - @saved_keywords.keys).each do |k|
+          puts "creating new keyword #{k} in #{@args[:name]}"
           begin
             @new_keywords[k].save
           rescue Exception => e
@@ -212,12 +214,14 @@ Example of input hash
 
         #adtexts to be deleted
         (@saved_adtexts.keys - @new_adtexts.keys).each do |k|
+          puts "deleting keyword #{k} in #{@args[:name]}"
           #don't try to remove already removed adtext
           @saved_adtexts[k].remove  unless @saved_adtexts[k].args[:status] == :stopped
         end
 
         #adtexts to be created
         (@new_adtexts.keys - @saved_adtexts.keys).each do |k|
+          puts "creating new adtext #{k} in #{@args[:name]}"
           begin
             @new_adtexts[k].save
           rescue Exception => e
