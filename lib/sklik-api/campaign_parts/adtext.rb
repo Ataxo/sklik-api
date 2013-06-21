@@ -12,11 +12,13 @@ class SklikApi
 =begin
 Example of input hash
 {
+  :adtext_id => 1234, #(OPTIONAL) -> when setted it will on save do update of existing adtext
   :headline => "Super headline",
   :description1 => "Trying to do ",
   :description2 => "best description ever",
   :display_url => "my_test_url.cz",
-  :url => "http://my_test_url.cz"
+  :url => "http://my_test_url.cz",
+  :status => :running,
 }
 
 

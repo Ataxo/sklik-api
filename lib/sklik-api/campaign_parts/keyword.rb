@@ -15,6 +15,7 @@ class SklikApi
 =begin
 Example of input hash
 {
+  :keyword_id => 1234, #(OPTIONAL) -> when setted it will on save do update of existing keyword
   :keyword => "\"some funny keyword\""
 }
 =end

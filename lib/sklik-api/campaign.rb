@@ -16,8 +16,7 @@ Example of input hash
   :campaign_id => 12345, #(OPTIONAL) -> when setted it will on save do update of existing campaign
   :name => "my campaign name - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}",
   :status => :running,
-  :cpc => 3,
-  :budget => 50,
+  :budget => 50, #in CZK
 
   :network_setting => {
     :content => true,

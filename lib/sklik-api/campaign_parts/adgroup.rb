@@ -10,6 +10,8 @@ Example of input hash
 {
   :adgroup_id => 1234, #(OPTIONAL) -> when setted it will on save do update of existing adgroup
   :name => "my adgroup name",
+  :cpc => 1.2, #in CZK
+  :stauts => :running,
   :ads => [
     {
       :headline => "Super headline",
