@@ -36,10 +36,34 @@ unless File.exists?(File.join(CONF_DIR, "access.rb"))
 end
 
 require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/unit/*.rb'
-  test.verbose = true
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'lib' << 'test'
+  t.test_files = FileList['test/functional/**/*_test.rb', 'test/unit/**/*_test.rb','test/integration/**/*_test.rb']
+  t.warning = false
+  t.verbose = false
+end
+
+namespace :test do
+  Rake::TestTask.new(:unit) do |t|
+    t.libs << 'lib' << 'test'
+    t.test_files = FileList['test/unit/**/*_test.rb']
+    t.warning = false
+    t.verbose = false
+  end
+
+  Rake::TestTask.new(:functional) do |t|
+    t.libs << 'lib' << 'test'
+    t.test_files = FileList['test/functional/**/*_test.rb']
+    t.warning = false
+    t.verbose = false
+  end
+
+  Rake::TestTask.new(:integration) do |t|
+    t.libs << 'lib' << 'test'
+    t.test_files = FileList['test/integration/**/*_test.rb']
+    t.warning = false
+    t.verbose = false
+  end
 end
 
 require 'rcov/rcovtask'
