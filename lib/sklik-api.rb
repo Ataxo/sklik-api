@@ -1,7 +1,6 @@
 # -*- encoding : utf-8 -*-
 require 'rubygems'
 require 'rack'
-require 'pp'
 require 'json'
 require 'unicode'
 require 'uri'
@@ -25,11 +24,29 @@ ENV['RACK_ENV'] ||= "development"
 
 #initialzie SklikApi class
 class SklikApi
-  
+
+  def self.use_rollback= how
+    @use_rollback = how
+  end
+
+  #default setting for rollback is true!
+  def self.use_rollback?
+    @use_rollback.nil? || @use_rollback
+  end
+
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
+
+  def self.log type, message
+    logger.send(type, "SklikApi: #{message}")
+  rescue Exception => e
+    puts "SklikApi.logger Exception: #{e.message}"
+  end
 end
 
 #including sklik-api
-["xmlrpc_setup",  "access", "connection", "sklik_object", "client", "campaign"].each do |file|
+["exceptions", "xmlrpc_setup",  "access", "connection", "sklik_object", "client", "campaign"].each do |file|
   require File.join(File.dirname(__FILE__),"/sklik-api/#{file}.rb")
 end
 
