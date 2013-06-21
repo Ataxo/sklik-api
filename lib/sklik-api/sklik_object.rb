@@ -12,6 +12,16 @@ class SklikApi
         SklikApi::Connection.connection
       end
 
+      def get name, id
+        args = ["#{name}.getAttributes", id]
+        return connection.call(*args) { |param|
+          param[name.to_sym].symbolize_keys
+        }
+      rescue SklikApi::NotFound => e
+        puts "#{e.class} - #{e.message}"
+        return nil
+      end
+
       def find name, id = nil
         if id
           args = ["list#{name.pluralize.camelize}", id]
@@ -77,6 +87,16 @@ class SklikApi
         }
       end
 
+      def status_for_update
+        if @args[:status] == :running
+          return "active"
+        elsif @args[:status] == :paused
+          return "suspend"
+        else
+          return nil
+        end
+      end
+
       def update_object
         out = connection.call("#{self.class::NAME}.setAttributes", *update_args ) { |param| true }
       end
@@ -95,6 +115,14 @@ class SklikApi
 
       def underscore_hash_keys hash
         hash.inject({ }) { |x, (k,v)| x[k.underscore.to_sym] = v; x }
+      end
+
+      def clear_errors
+        @errors = []
+      end
+
+      def errors
+        @errors ||= []
       end
     end
   end
