@@ -4,7 +4,7 @@ class SklikApi
 
     NAME = "group"
 
-    include Object
+    include SklikObject
 =begin
 Example of input hash
 {

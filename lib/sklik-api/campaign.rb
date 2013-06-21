@@ -9,7 +9,7 @@ class SklikApi
       :adSelection, :startDate, :endDate, :premiseId
     ]
 
-    include Object
+    include SklikObject
 =begin
 Example of input hash
 {

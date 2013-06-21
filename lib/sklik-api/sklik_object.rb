@@ -1,6 +1,6 @@
 # -*- encoding : utf-8 -*-
 class SklikApi
-  module Object
+  module SklikObject
     def self.included(base)
       base.send :extend, ClassMethods
       base.send :include, InstanceMethods

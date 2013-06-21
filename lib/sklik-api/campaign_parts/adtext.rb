@@ -8,7 +8,7 @@ class SklikApi
       :premiseMode, :premiseID
     ]
 
-    include Object
+    include SklikObject
 =begin
 Example of input hash
 {
