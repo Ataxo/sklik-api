@@ -57,14 +57,13 @@ Example of input hash
       #variable where are saved current data from system
       @campaign_data = nil
 
-      #variable for storing errors
-      @errors = []
+      @args = args
 
       #initialize adgroups
       @adgroups = []
       if args[:ad_groups] && args[:ad_groups].size > 0
         args[:ad_groups].each do |adgroup|
-          @adgroups << SklikApi::Adgroup.new(self, adgroup)
+          @adgroups << SklikApi::Adgroup.new(adgroup.merge(:campaign => self))
         end
       end
 
@@ -72,25 +71,50 @@ Example of input hash
       super args
     end
 
-    def errors
-      @errors
+    def self.get id
+      return ArgumentError, "Please provide param (campaign id)" unless id
+      if campaign = super(NAME, id)
+        SklikApi::Campaign.new(process_sklik_data campaign)
+      else
+        nil
+      end
     end
 
     def self.find args = {}
       out = []
+
+      #asking fo campaign by ID
+      if args.is_a?(Integer)
+        return get args
+
+      #asking for campaign by hash with adgroup_id
+      elsif args.is_a?(Hash) && args[:campaign_id]
+        if campaign = get(args[:campaign_id])
+          return [campaign]
+        else
+          return []
+        end
+      end
+
       super(NAME, args[:customer_id]).each do |campaign|
-        if (args[:campaign_id].nil? || (args[:campaign_id] && args[:campaign_id].to_i == campaign[:id].to_i)) && #find by campaign id
-          (args[:status].nil? || (args[:status] && args[:status] == fix_status(campaign))) # find by status
-          out << SklikApi::Campaign.new(
-            :campaign_id => campaign[:id],
-            :customer_id => args[:customer_id],
-            :budget => campaign[:dayBudget].to_f/100.0,
-            :name => campaign[:name],
-            :status => fix_status(campaign)
-          )
+        if (args[:status].nil? || (args[:status] && args[:status] == fix_status(campaign))) && # find by status
+          (args[:name].nil? || (args[:name] == campaign[:name]))
+          out << SklikApi::Campaign.new(process_sklik_data campaign)
         end
       end
       out
+    end
+
+    def self.process_sklik_data campaign = {}
+      {
+        :campaign_id => campaign[:id],
+        :customer_id => campaign[:userId],
+        :budget => campaign[:dayBudget].to_f/100.0,
+        :name => campaign[:name],
+        :status => fix_status(campaign),
+        :excluded_search_services => campaign[:excludedSearchServices],
+        :network_setting=> {:content=>campaign[:context], :search=>true}
+      }
     end
 
     def self.list_search_services
@@ -111,18 +135,13 @@ Example of input hash
       end
     end
 
-    def status_for_update
-      if @args[:status] == :running
-        return "active"
-      elsif @args[:status] == :paused
-        return "suspend"
-      else
-        return nil
-      end
-    end
-
     def adgroups
-      Adgroup.find(self)
+      if @args[:campaign_id] && get_current_status == :stopped
+        SklikApi.log :error, "Campaign: #{@args[:campaign_id]} - Can't get adgroups for stopped Campaign!"
+        []
+      else
+        Adgroup.find(campaign_id: self.args[:campaign_id])
+      end
     end
 
     def to_hash
@@ -131,7 +150,7 @@ Example of input hash
       else
         @campaign_data = @args
         if @args[:status] != :stopped
-          @campaign_data[:ad_groups] = Adgroup.find(self).collect{|a| a.to_hash}
+          @campaign_data[:ad_groups] = Adgroup.find(campaign_id: self.args[:campaign_id]).collect{|a| a.to_hash}
         else
           @campaign_data[:ad_groups] = []
         end
@@ -146,17 +165,17 @@ Example of input hash
       out << @args[:campaign_id]
 
       #prepare campaign struct
-      args = {}
-      args[:name] = @args[:name] if @args[:name]
-      args[:status] = status_for_update if status_for_update
-      args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
-      args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
+      u_args = {}
+      u_args[:name] = @args[:name] if @args[:name]
+      u_args[:status] = status_for_update if status_for_update
+      u_args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
+      u_args[:context] = @args[:network_setting][:content].nil? || @args[:network_setting][:content]  if @args[:network_setting]
       ADDITIONAL_FIELDS.each do |add_info|
         field_name = add_info.to_s.underscore.to_sym
-        args[add_info] = @args[field_name] if @args[field_name]
+        u_args[add_info] = @args[field_name] if @args[field_name]
       end
 
-      out << args
+      out << u_args
 
       out
     end
@@ -165,16 +184,16 @@ Example of input hash
       out = []
 
       #prepare campaign struct
-      args = {}
-      args[:name] = @args[:name]
-      args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
-      args[:context] = @args[:network_setting][:context] ||= true if @args[:network_setting]
+      c_args = {}
+      c_args[:name] = @args[:name]
+      c_args[:status] = status_for_update if status_for_update
+      c_args[:dayBudget] = (@args[:budget] * 100).to_i if @args[:budget]
+      c_args[:context] = @args[:network_setting][:content].nil? || @args[:network_setting][:content] if @args[:network_setting]
       ADDITIONAL_FIELDS.each do |add_info|
         field_name = add_info.to_s.underscore.to_sym
-        args[add_info] = @args[field_name] if @args[field_name]
+        c_args[add_info] = @args[field_name] if @args[field_name]
       end
-
-      out << args
+      out << c_args
 
       #add customer id on which account campaign should be created
       out << @customer_id if @customer_id
@@ -183,10 +202,8 @@ Example of input hash
 
     def self.get_current_status args = {}
       raise ArgumentError, "Campaign_id is required" unless args[:campaign_id]
-      campaigns = self.find(args)
-      pp campaigns
-      if campaigns.size == 1
-        campaigns.first.args[:status]
+      if campaign = self.get(args[:campaign_id])
+        campaign.args[:status]
       else
         raise ArgumentError, "Campaign by #{args.inspect} couldn't be found!"
       end
@@ -204,14 +221,22 @@ Example of input hash
       if args[:ad_groups] && args[:ad_groups].size > 0
         @adgroups_update = true
         args[:ad_groups].each do |adgroup|
-          @adgroups << SklikApi::Adgroup.new(self, adgroup)
+          @adgroups << SklikApi::Adgroup.new(adgroup.merge(campaign: self))
         end
       end
 
       save
     end
 
+    def valid?
+      clear_errors
+      log_error "name is required" unless args[:name] && args[:name].size > 0
+      log_error "budget must be more than 1 CZK" unless args[:budget] && args[:budget] > 1.0
+      !errors.any?
+    end
+
     def save
+      clear_errors
       if @args[:campaign_id]  #do update
         #get current status of campaign
         before_status = get_current_status
@@ -241,7 +266,9 @@ Example of input hash
             #adgroups to be created
             (@new_adgroups.keys - @saved_adgroups.keys).each do |k|
               puts "creating new adgroup: #{@new_adgroups[k].args[:name]}"
-              @new_adgroups[k].save
+              unless @new_adgroups[k].save
+                log_error({"Creation of: #{@new_adgroups[k].args[:name]}"=> @new_adgroups[k].errors})
+              end
             end
 
             #check status to be running
@@ -251,47 +278,65 @@ Example of input hash
                 @saved_adgroups[k].restore
               end
               puts "updating adgroup: #{@saved_adgroups[k].args[:name]}"
-              @saved_adgroups[k].update @new_adgroups[k]
+              unless @saved_adgroups[k].update @new_adgroups[k]
+                log_error({"Creation of: #{@saved_adgroups[k].args[:name]}"=> @saved_adgroups[k].errors})
+              end
             end
 
           end
 
         rescue Exception => e
-          @errors << e.message
+          log_error e.message
         end
 
         #remove it if new status is stopped or status doesn't changed and before it was stopped
         remove if (@args[:status] == :stopped) || (@args[:status].nil? && before_status == :stopped)
 
-        raise ArgumentError, "Problem with updating campaign datas #{@errors}" unless @errors.size == 0
-
-        return true
       else                    #do save
         #create campaign
         begin
           create
         rescue Exception => e
-          @errors << e.message
+          log_error e.message
+          #don't continue with creating campaign!
           return false
         end
 
-        begin
-          #create adgroups
-          @adgroups.each{ |adgroup| adgroup.save }
-
-          @campaign_data = @args
-          raise ArgumentError, "Problem with creating campaign datas" unless @errors.size == 0
-          return true
-        rescue Exception => e
-          @errors << e.message
-          #update name
-          update :name => "#{@args[:name]} FAILED ON CREATION - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
-          #remove campaign
-          remove
-          #return false because error occured
-          return false
+        #create adgroups
+        unless @adgroups.all?{ |adgroup| adgroup.save }
+          return rollback!
         end
+
+        @campaign_data = @args
+
+        #remove campaign when it was started with stopped status!
+        remove if @args[:status] && @args[:status].to_s.to_sym == :stopped
+
       end
+
+      !errors.any?
+    end
+
+    def log_error message
+      errors << message
+    end
+
+    def rollback!
+      #don't rollback if it is disabled!
+      return false unless SklikApi.use_rollback?
+
+      #remember errors!
+      old_errors = errors
+
+      SklikApi.log :info, "Campaign: #{@args[:campaign_id]} - ROLLBACK!"
+      update :name => "#{@args[:name]} FAILED ON CREATION - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
+      #remove adgroup
+      remove
+
+      #return remembered errors!
+      @errors = old_errors
+      #don't continue with creating adgroup!
+      return false
     end
   end
 end
