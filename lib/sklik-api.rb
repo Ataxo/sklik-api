@@ -25,6 +25,14 @@ ENV['RACK_ENV'] ||= "development"
 #initialzie SklikApi class
 class SklikApi
 
+  def self.use_sandbox_for_test= how
+    @use_sandbox_for_test = how
+  end
+
+  def self.use_sandbox_for_test?
+    @use_sandbox_for_test.nil? ? true : !!@use_sandbox_for_test
+  end
+
   def self.use_rollback= how
     @use_rollback = how
   end

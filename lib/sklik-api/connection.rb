@@ -18,7 +18,7 @@ class SklikApi
 
     #prepare connection to sklik
     def connection
-      path = (ENV['RACK_ENV'] || ENV['RAILS']) == "test" ? "/sandbox/RPC2" : "/RPC2"
+      path = (SklikApi.use_sandbox_for_test? && (ENV['RACK_ENV'] || ENV['RAILS'] == "test") ? "/sandbox/RPC2" : "/RPC2"
       server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
       server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
       #fix of UTF-8 encoding
