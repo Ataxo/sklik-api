@@ -320,7 +320,7 @@ Example of input hash
       errors << message
     end
 
-    def rollback!
+    def rollback! suffix = "FAILED ON CREATION"
       #don't rollback if it is disabled!
       return false unless SklikApi.use_rollback?
 
@@ -328,7 +328,7 @@ Example of input hash
       old_errors = errors
 
       SklikApi.log :info, "Campaign: #{@args[:campaign_id]} - ROLLBACK!"
-      update :name => "#{@args[:name]} FAILED ON CREATION - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
+      update :name => "#{@args[:name]} #{suffix} - #{Time.now.strftime("%Y.%m.%d %H:%M:%S")}"
       #remove adgroup
       remove
 
