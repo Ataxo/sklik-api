@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "sklik-api"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ondrej Bartas"]
-  s.date = "2013-06-21"
+  s.date = "2013-06-23"
   s.description = "Sklik advertising PPC api for creating campaigns and updating them when they runs"
   s.email = "ondrej@bartas.cz"
   s.extra_rdoc_files = [
