@@ -44,6 +44,22 @@ class CampaignIntegrationTest < Test::Unit::TestCase
       assert_equal SklikApi::Campaign.get(campaign.args[:campaign_id]).args[:status], :stopped
     end
 
+    should "remove and restore multiple times" do
+      campaign = SklikApi::Campaign.new(@only_campaign_hash)
+      assert campaign.save, "Problem with creating campaing: #{campaign.errors}"
+      assert_nothing_raised do
+        assert SklikApi::Campaign.get(campaign.args[:campaign_id]).remove, "Campaign should be removed"
+        assert_equal SklikApi::Campaign.get(campaign.args[:campaign_id]).args[:status], :stopped, "Campaign should have stopped status"
+        assert SklikApi::Campaign.get(campaign.args[:campaign_id]).remove, "Campaign should be removed second time without exception"
+        assert_equal SklikApi::Campaign.get(campaign.args[:campaign_id]).args[:status], :stopped, "Campaign should have stopped status for second time"
+        assert SklikApi::Campaign.get(campaign.args[:campaign_id]).restore, "Campaign should be restored"
+        assert_equal SklikApi::Campaign.get(campaign.args[:campaign_id]).args[:status], :running, "Campaign should have running status"
+        assert SklikApi::Campaign.get(campaign.args[:campaign_id]).restore, "Campaign should be restored second time without exception"
+        assert_equal SklikApi::Campaign.get(campaign.args[:campaign_id]).args[:status], :running, "Campaign should have running status for second time"
+      end
+    end
+
+
     should "find" do
       assert_equal SklikApi::Campaign.find(@campaign.args[:campaign_id]).to_hash.to_a.sort, @only_campaign_hash.to_a.sort
       assert_equal SklikApi::Campaign.find(campaign_id: @campaign.args[:campaign_id]).first.to_hash.to_a.sort, @only_campaign_hash.to_a.sort

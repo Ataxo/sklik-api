@@ -54,9 +54,6 @@ class SklikApi
         begin
           connection.call("#{self.class::NAME}.restore", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
         rescue Exception => e
-          # if there is a problem but returned Not removed
-          # return true, becasue it says it is restored
-          return true if e.message == "Rescuing from request by: ArgumentError - There is error from sklik #{self.class.to_s.downcase}.restore: Not removed"
           raise e
         end
       end

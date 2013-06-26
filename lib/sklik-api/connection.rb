@@ -68,6 +68,9 @@ class SklikApi
         SklikApi.log(:debug, "Response from api: #{param.inspect}") unless method == "client.login"
         if [200].include?(param[:status])
           return yield(param)
+        elsif param[:status] == 204 #Already removed
+          SklikApi.log(:info, "Trying to #{method} of #{args.inspect} but object is already in this status")
+          return true
         elsif param[:status] == 400
           raise SklikApi::InvalidArguments, "Calling method: #{method} with invalid arguments: #{args}, #{param.inspect}"
         elsif param[:status] == 404
