@@ -59,7 +59,7 @@ Example of input hash
       #initialize adgroups
       @adtexts = []
       if args[:ads] && args[:ads].size > 0
-        args[:ads].each do |adtext|
+        args[:ads].select{|a| !a.nil? }.each do |adtext|
           @adtexts << SklikApi::Adtext.new(adtext.merge(:adgroup => self))
         end
       end
@@ -67,7 +67,7 @@ Example of input hash
       #initialize adgroups
       @keywords = []
       if args[:keywords] && args[:keywords].size > 0
-        args[:keywords].each do |keyword|
+        args[:keywords].select{|k| !k.nil? }.each do |keyword|
           if keyword.is_a?(Hash)
             @keywords << SklikApi::Keyword.new(keyword.merge(:adgroup => self))
           else
@@ -324,57 +324,62 @@ Example of input hash
           ## KEYWORDS
           ############
 
-          #update keywords
-          keywords_error = []
-          @new_keywords = @keywords.clone
-          delete_first = true
-          while @new_keywords && @new_keywords.size > 0 do
-            begin
-              connection.call('keywords.set', @args[:adgroup_id], @new_keywords[0..199].collect{|k| k.create_args.last }, delete_first) do |params|
-                log_error params[:statusMessage] if params[:statusMessage] != "OK"
+          #update keywords only when setted
+          if @keywords.size > 0
+            #update keywords
+            keywords_error = []
+            @new_keywords = @keywords.clone
+            delete_first = true
+            while @new_keywords && @new_keywords.size > 0 do
+              begin
+                connection.call('keywords.set', @args[:adgroup_id], @new_keywords[0..199].collect{|k| k.create_args.last }, delete_first) do |params|
+                  log_error params[:statusMessage] if params[:statusMessage] != "OK"
+                end
+              rescue Exception => e
+                log_error e.message
               end
-            rescue Exception => e
-              log_error e.message
+              @new_keywords = @new_keywords[200..-1]
+              delete_first = false
             end
-            @new_keywords = @new_keywords[200..-1]
-            delete_first = false
           end
 
           ############
           ## ADTEXTS
           ############
+  
+          #update adtexts only when setted
+          if @adtexts.size > 0          
+            #create new adtexts and delete old
+            @saved_adtexts = adtexts.inject({}){|o,a| o[a.uniq_identifier] = a ; o}
+            @new_adtexts = @adtexts.inject({}){|o,a| o[a.uniq_identifier] = a ; o}
 
-          #create new adtexts and delete old
-          @saved_adtexts = adtexts.inject({}){|o,a| o[a.uniq_identifier] = a ; o}
-          @new_adtexts = @adtexts.inject({}){|o,a| o[a.uniq_identifier] = a ; o}
+            #adtexts to be deleted
+            (@saved_adtexts.keys - @new_adtexts.keys).each do |k|
+              puts "deleting adtext #{@saved_adtexts[k]} in #{@args[:name]}"
+              #don't try to remove already removed adtext
+              @saved_adtexts[k].remove  unless @saved_adtexts[k].args[:status] == :stopped
+            end
 
-          #adtexts to be deleted
-          (@saved_adtexts.keys - @new_adtexts.keys).each do |k|
-            puts "deleting adtext #{@saved_adtexts[k]} in #{@args[:name]}"
-            #don't try to remove already removed adtext
-            @saved_adtexts[k].remove  unless @saved_adtexts[k].args[:status] == :stopped
-          end
-
-          #adtexts to be created
-          (@new_adtexts.keys - @saved_adtexts.keys).each do |k|
-            puts "creating new adtext #{k} in #{@args[:name]}"
-            begin
-              @new_adtexts[k].save
-            rescue Exception => e
-              #take care about error message -> do it nicer
-              if /There is error from sklik ad.create: Invalid parameters/ =~ e.message
-                log_error "Problem with creating #{@new_adtexts[k].args} in adgroup #{@args[:name]}"
-              else
-                log_error e.message
+            #adtexts to be created
+            (@new_adtexts.keys - @saved_adtexts.keys).each do |k|
+              puts "creating new adtext #{k} in #{@args[:name]}"
+              begin
+                @new_adtexts[k].save
+              rescue Exception => e
+                #take care about error message -> do it nicer
+                if /There is error from sklik ad.create: Invalid parameters/ =~ e.message
+                  log_error "Problem with creating #{@new_adtexts[k].args} in adgroup #{@args[:name]}"
+                else
+                  log_error e.message
+                end
               end
             end
-          end
 
-          #check status to be running
-          (@new_adtexts.keys & @saved_adtexts.keys).each do |k|
-            @saved_adtexts[k].restore if @saved_adtexts[k].args[:status] == :stopped
+            #check status to be running
+            (@new_adtexts.keys & @saved_adtexts.keys).each do |k|
+              @saved_adtexts[k].restore if @saved_adtexts[k].args[:status] == :stopped
+            end
           end
-
         rescue Exception => e
           log_error e.message
         end
