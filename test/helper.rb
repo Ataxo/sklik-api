@@ -18,5 +18,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'sklik-api'
 require './test/fake_web'
 
+SklikApi.logger = Logger.new('log/sklik_api_test.log')
+
 class Test::Unit::TestCase
 end
