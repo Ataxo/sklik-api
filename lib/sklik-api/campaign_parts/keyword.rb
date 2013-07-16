@@ -95,7 +95,7 @@ Example of input hash
     end
 
     def strip_match_type keyword
-      keyword.gsub(/(\[|\]|\")/, "").gsub(/^-/, "")
+      "#{keyword}".gsub(/(\[|\]|\")/, "").gsub(/^-/, "")
     end
 
     def get_math_type keyword
@@ -203,7 +203,8 @@ Example of input hash
       if @keyword_data
         @keyword_data
       else
-        @keyword_data = @args      end
+        @keyword_data = @args
+      end
     end
 
 
