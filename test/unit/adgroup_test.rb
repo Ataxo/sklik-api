@@ -56,15 +56,16 @@ class AdgroupTest < Test::Unit::TestCase
     end
 
     should "be found/get by id" do
-      adgroup = SklikApi::Adgroup.get(7053769)
+      adgroup_id = SklikApi::Campaign.find(@campaign.args[:campaign_id]).adgroups.first.args[:adgroup_id]
+      adgroup = SklikApi::Adgroup.get(adgroup_id)
       assert_not_nil adgroup
       assert adgroup.is_a?(SklikApi::Adgroup), "return SklikApi::Adgroup"
 
-      adgroup = SklikApi::Adgroup.find(adgroup_id: 7053769).first
+      adgroup = SklikApi::Adgroup.find(adgroup_id: adgroup_id).first
       assert_not_nil adgroup
       assert adgroup.is_a?(SklikApi::Adgroup), "return SklikApi::Adgroup"
 
-      adgroup = SklikApi::Adgroup.find(campaign_id: 'doesnt matter', adgroup_id: 7053769).first
+      adgroup = SklikApi::Adgroup.find(campaign_id: 'doesnt matter', adgroup_id: adgroup_id).first
       assert_not_nil adgroup
       assert adgroup.is_a?(SklikApi::Adgroup), "return SklikApi::Adgroup"
     end
