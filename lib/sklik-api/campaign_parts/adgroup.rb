@@ -70,6 +70,8 @@ Example of input hash
         args[:keywords].select{|k| !k.nil? }.each do |keyword|
           if keyword.is_a?(Hash)
             @keywords << SklikApi::Keyword.new(keyword.merge(:adgroup => self))
+          elsif keyword.is_a?(SklikApi::Keyword)
+            @keywords << SklikApi::Keyword.new(:keyword => keyword.args[:keyword] || keyword.args[:name], :adgroup => self)
           else
             @keywords << SklikApi::Keyword.new(:keyword => keyword, :adgroup => self)
           end
