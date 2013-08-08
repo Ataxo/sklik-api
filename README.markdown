@@ -25,9 +25,13 @@ SklikApi.use_rollback = true
 
 # you can set it before every action to sklik api, if you have multiple accounts :-)
 SklikApi::Access.set(
-  :email => "your_email@seznam.cz",
+  :email    => "your_email@seznam.cz",
   :password => "password",
-  # :customer_id => 1112 # (optional) - this will switch you into connected account and all creation will be performed there
+  :session  => "123456789000000000",  # optional when you store session (14 days expiration)
+                                      # outside your running code (in database etc.)
+                                      # this will lower your request numbers (no need for getting new session for every call)
+  # :customer_id => 1112  # (optional) - this will switch you into connected account
+                          # and all creation will be performed there
 )
 #this setting can be changed on the fly!
 ```

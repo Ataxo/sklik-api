@@ -34,21 +34,36 @@ class SklikApi
     #every taxonomy has its own session!
     def get_session force = false
       @session ||= {}
+      #try to get session from cache
       if @session.has_key?(SklikApi::Access.uniq_identifier) && !force
         @session[SklikApi::Access.uniq_identifier]
+
+      #try to use session from Access settings
+      elsif SklikApi::Access.session? && !force
+        return @session[SklikApi::Access.uniq_identifier] = SklikApi::Access.session
+
+      #else retrive new session
       else
         begin
           SklikApi.log(:debug, "Getting session for #{SklikApi::Access.email}")
           param = connection.call("client.login", SklikApi::Access.email, SklikApi::Access.password).symbolize_keys
           SklikApi.log(:debug, "Session received: #{param.inspect}")
 
-          if param[:status] == 401
-            raise ArgumentError, "Invalid login for: #{SklikApi::Access.email}"
-          elsif param[:status] == 200
+          #good session
+          if param[:status] == 200
+            #SET NEW SESSION
+            SklikApi::Access.session = param[:session]
             return @session[SklikApi::Access.uniq_identifier] = param[:session]
+
+          #bad login
+          elsif param[:status] == 401
+            raise ArgumentError, "Invalid login for: #{SklikApi::Access.email}"
+
+          #Something else went wrong
           else
             raise ArgumentError, param[:statusMessage]
           end
+
         rescue XMLRPC::FaultException => e
           raise ArgumentError, "#{e.faultString}, #{e.faultCode}"
         rescue Exception => e

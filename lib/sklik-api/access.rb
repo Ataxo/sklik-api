@@ -10,7 +10,10 @@ class SklikApi::Access
     
     #save argument to right places
     @args = args
-    
+
+    #save session if present
+    @session = args.has_key?(:session) ? args[:session] : nil
+
     #return this object!
     return self
   end
@@ -37,6 +40,21 @@ class SklikApi::Access
   #return password
   def self.password
     @args[:password].to_s
+  end
+
+  #Set session
+  def self.session= session
+    session
+  end
+
+  #Get session
+  def self.session
+    @session
+  end
+
+  #Has setted session
+  def self.session?
+    !@session.nil?
   end
     
   #if you change Access credentials change uniq identifier -> 
