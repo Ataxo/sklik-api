@@ -44,7 +44,7 @@ class SklikApi::Access
 
   #Set session
   def self.session= session
-    session
+    @session = session
   end
 
   #Get session
