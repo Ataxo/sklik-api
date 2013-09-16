@@ -29,6 +29,14 @@ class SklikApi
       server
     end
 
+    def set_new_session response
+      @session ||= {}
+      if response.has_key?(:session)
+        @session[SklikApi::Access.uniq_identifier] = response[:session]
+        SklikApi::Access.session = response[:session]
+      end
+    end
+
     #Get session is method for login into sklik
     #save session for other requests until it expires
     #every taxonomy has its own session!
@@ -81,6 +89,10 @@ class SklikApi
         #get response from sklik
         param = connection.call( method, get_session, *args ).symbolize_keys
         SklikApi.log(:debug, "Response from api: #{param.inspect}") unless method == "client.login"
+
+        # save session from new call - if present
+        set_new_session param
+
         if [200].include?(param[:status])
           return yield(param)
         elsif param[:status] == 204 #Already removed
