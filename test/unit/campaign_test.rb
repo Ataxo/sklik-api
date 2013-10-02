@@ -5,7 +5,7 @@ class CampaignTest < Test::Unit::TestCase
   context "Campaign" do
 
     should "be found" do
-      assert SklikApi::Campaign.find(:customer_id => 192495).size > 0, "In sklik sandbox should be some campaigns"
+      assert SklikApi::Campaign.find(:customer_id => 250497).size > 0, "In sklik sandbox should be some campaigns"
     end
 
     should "be found without specifying customer_id" do
@@ -34,7 +34,7 @@ class CampaignTest < Test::Unit::TestCase
           :name => "hustokrutě megapřísně - #{Time.now.strftime("%Y.%m.%d %H:%M:%S.%L")} - only",
           :status => :running,
           :budget => 15.0,
-          :customer_id => 192495,
+          :customer_id => 250497,
           :excluded_search_services => [2,3,4,5,6,7,8], #choose only seznam.cz
           :network_setting => {
             :content => true,
@@ -164,7 +164,7 @@ class CampaignTest < Test::Unit::TestCase
           :status => :running,
           :cpc => 3.5,
           :budget => 15.0,
-          :customer_id => 192495,
+          :customer_id => 250497,
           :excluded_search_services => [2,3,4,5,6,7,8], #choose only seznam.cz
           :network_setting => {
             :content => true,

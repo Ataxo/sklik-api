@@ -9,7 +9,7 @@ class AdgroupTest < Test::Unit::TestCase
         :status => :running,
         :budget => 15.0,
         :cpc => 3.5,
-        :customer_id => 192495,
+        :customer_id => 250497,
         :excluded_search_services => [2,3,4,5,6,7,8], #choose only seznam.cz
         :network_setting => {
           :content => true,
