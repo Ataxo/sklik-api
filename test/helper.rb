@@ -13,6 +13,7 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
+
 require 'test/unit'
 require 'turn'
 require 'shoulda-context'
@@ -23,6 +24,15 @@ require 'sklik-api'
 require './test/fake_web'
 
 SklikApi.logger = Logger.new('log/sklik_api_test.log')
+
+#set test account for travis!
+if ENV['TRAVIS'] == "yes"
+  SklikApi::Access.set(
+      :email => "test-travis@seznam.cz",
+      :password => "passwordfortravis"
+    )
+  SklikApi.use_sandbox_for_test= false
+end
 
 class Test::Unit::TestCase
 end

@@ -30,9 +30,12 @@ Jeweler::RubygemsDotOrgTasks.new
 CONF_DIR = File.expand_path(File.join("..", "config"), __FILE__)
 
 #copy example config files for redis and elastic if they don't exists
-unless File.exists?(File.join(CONF_DIR, "access.rb")) 
-  FileUtils.cp(File.join(CONF_DIR, "access.rb.example"), File.join(CONF_DIR, "access.rb") ) 
-  puts "WARNING: you need to setup your config/access.rb -> I created this file for you with example usage"
+
+unless ENV['TRAVIS'] == "yes"
+  unless File.exists?(File.join(CONF_DIR, "access.rb"))
+    FileUtils.cp(File.join(CONF_DIR, "access.rb.example"), File.join(CONF_DIR, "access.rb") )
+    puts "WARNING: you need to setup your config/access.rb -> I created this file for you with example usage"
+  end
 end
 
 require 'rake/testtask'
