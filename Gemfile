@@ -17,5 +17,5 @@ group :development do
   gem "fakeweb"
   gem "thin"
   gem "shotgun"
-  gem "rcov", "= 0.9.10"
+  gem "simplecov"
 end
