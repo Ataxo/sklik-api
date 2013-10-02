@@ -2,6 +2,10 @@ require 'rubygems'
 require 'bundler'
 require 'fakeweb'
 
+require 'simplecov'
+SimpleCov.start 'test_frameworks' do
+end
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
