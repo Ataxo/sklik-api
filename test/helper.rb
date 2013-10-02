@@ -30,7 +30,11 @@ if ENV['TRAVIS'] == "yes"
       :email => "test-travis@seznam.cz",
       :password => "passwordfortravis"
     )
-  SklikApi.use_sandbox_for_test= false
+  #use production (not sandbox)
+  SklikApi.use_sandbox_for_test = false
+
+  #disable logger
+  SklikApi.logger = nil
 else
   SklikApi.logger = Logger.new('log/sklik_api_test.log')
 end

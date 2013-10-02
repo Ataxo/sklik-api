@@ -51,7 +51,9 @@ class SklikApi
   end
 
   def self.log type, message
-    logger.send(type, "SklikApi: #{message}")
+    if logger
+      logger.send(type, "SklikApi: #{message}")
+    end
   rescue Exception => e
     puts "SklikApi.logger Exception: #{e.message}"
   end
