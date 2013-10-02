@@ -1,4 +1,5 @@
-# Sklik API
+Sklik API [![Gem Version](https://badge.fury.io/rb/sklik-api.png)](http://badge.fury.io/rb/sklik-api) [![Build Status](https://travis-ci.org/Ataxo/sklik-api.png?branch=master)](https://travis-ci.org/Ataxo/sklik-api) [![Coverage Status](https://coveralls.io/repos/Ataxo/sklik-api/badge.png?branch=master)](https://coveralls.io/r/Ataxo/sklik-api?branch=master)
+================================================================================================================================================================================================================================================================================================================================================================================================================================================
 
 Sklik advertising PPC api for creating campaigns
 
