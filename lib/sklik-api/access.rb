@@ -9,63 +9,64 @@ class SklikApi::Access
     raise ArgumentError, "password is required" unless args[:password]
     
     #save argument to right places
-    @args = args
+    Thread.current[:sklik_api] ||= {}
+    Thread.current[:sklik_api][:args] = args
 
     #save session if present
-    @session = args.has_key?(:session) ? args[:session] : nil
+    Thread.current[:sklik_api][:session] = args.has_key?(:session) ? args[:session] : nil
 
     #return this object!
     return self
   end
 
   def self.get
-    Marshal.load( Marshal.dump (@args )) 
+    Marshal.load( Marshal.dump ( Thread.current[:sklik_api][:args] )) 
   end
   
   #return email
   def self.email
-    @args[:email].to_s
+    Thread.current[:sklik_api][:args][:email].to_s
   end
 
   #for login take first part of email "name@seznam.cz" -> "name"
   def self.login
-    @args[:email].to_s.split("@").first
+    Thread.current[:sklik_api][:args][:email].to_s.split("@").first
   end
 
   #return customer_id
-  def self.customer_id    
-    @args.has_key?(:customer_id) && @args[:customer_id] ? @args[:customer_id] : nil
+  def self.customer_id
+    Thread.current[:sklik_api][:args].has_key?(:customer_id) && Thread.current[:sklik_api][:args][:customer_id] ? Thread.current[:sklik_api][:args][:customer_id] : nil
   end
 
   #return password
   def self.password
-    @args[:password].to_s
+    Thread.current[:sklik_api][:args][:password].to_s
   end
 
   #Set session
   def self.session= session
-    @session = session
+    Thread.current[:sklik_api][:session] = session
   end
 
   #Get session
   def self.session
-    @session
+    Thread.current[:sklik_api][:session]
   end
 
   #Has setted session
   def self.session?
-    !@session.nil?
+    !Thread.current[:sklik_api][:session].nil?
   end
     
   #if you change Access credentials change uniq identifier -> 
   #used for stroing sessions for multiple logins
   def self.uniq_identifier 
-    "#{@args[:email]}:#{@args[:password]}"
+    "#{Thread.current[:sklik_api][:args][:email]}:#{Thread.current[:sklik_api][:args][:password]}"
   end
   
   #to prevent changes in settings dump it
   def self.access
-    Marshal.load( Marshal.dump( @args ))
+    Marshal.load( Marshal.dump( Thread.current[:sklik_api][:args] ))
   end
   
 end

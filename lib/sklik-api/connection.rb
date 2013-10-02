@@ -18,21 +18,23 @@ class SklikApi
 
     #prepare connection to sklik
     def connection
-      path = (SklikApi.use_sandbox_for_test? && (ENV['RACK_ENV'] || ENV['RAILS'] == "test")) ? "/sandbox/RPC2" : "/RPC2"
-      server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
-      server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
-      #fix of UTF-8 encoding
-      server.extend(XMLRPCWorkAround)
-      #debug mode to see what XMLRPC is doing
-      server.set_debug(File.open("log/xmlrpc-#{Time.now.strftime("%Y_%m_%d-%H_%M_%S")}.log","a:UTF-8")) if @args[:debug]
-
-      server
+      unless Thread.current[:sklik_api][:connection]
+        path = (SklikApi.use_sandbox_for_test? && (ENV['RACK_ENV'] || ENV['RAILS'] == "test")) ? "/sandbox/RPC2" : "/RPC2"
+        server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
+        server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
+        #fix of UTF-8 encoding
+        server.extend(XMLRPCWorkAround)
+        #debug mode to see what XMLRPC is doing
+        server.set_debug(File.open("log/xmlrpc-#{Time.now.strftime("%Y_%m_%d-%H_%M_%S")}.log","a:UTF-8")) if @args[:debug]
+        Thread.current[:sklik_api][:connection] = server
+      end
+      Thread.current[:sklik_api][:connection]
     end
 
     def set_new_session response
-      @session ||= {}
+      Thread.current[:sklik_api][:sessions] ||= {}
       if response.has_key?(:session)
-        @session[SklikApi::Access.uniq_identifier] = response[:session]
+        Thread.current[:sklik_api][:sessions][SklikApi::Access.uniq_identifier] = response[:session]
         SklikApi::Access.session = response[:session]
       end
     end
@@ -41,14 +43,14 @@ class SklikApi
     #save session for other requests until it expires
     #every taxonomy has its own session!
     def get_session force = false
-      @session ||= {}
+      Thread.current[:sklik_api][:sessions] ||= {}
       #try to get session from cache
-      if @session.has_key?(SklikApi::Access.uniq_identifier) && !force
-        @session[SklikApi::Access.uniq_identifier]
+      if Thread.current[:sklik_api][:sessions].has_key?(SklikApi::Access.uniq_identifier) && !force
+        Thread.current[:sklik_api][:sessions][SklikApi::Access.uniq_identifier]
 
       #try to use session from Access settings
       elsif SklikApi::Access.session? && !force
-        return @session[SklikApi::Access.uniq_identifier] = SklikApi::Access.session
+        return Thread.current[:sklik_api][:sessions][SklikApi::Access.uniq_identifier] = SklikApi::Access.session
 
       #else retrive new session
       else
@@ -61,7 +63,7 @@ class SklikApi
           if param[:status] == 200
             #SET NEW SESSION
             SklikApi::Access.session = param[:session]
-            return @session[SklikApi::Access.uniq_identifier] = param[:session]
+            return Thread.current[:sklik_api][:sessions][SklikApi::Access.uniq_identifier] = param[:session]
 
           #bad login
           elsif param[:status] == 401
