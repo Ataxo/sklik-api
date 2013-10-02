@@ -47,7 +47,10 @@ class SklikApi
   end
 
   def self.logger
-    @logger ||= Logger.new(STDOUT)
+    if @logger.nil? 
+      @logger = Logger.new(STDOUT)
+    end
+    @logger
   end
 
   def self.log type, message

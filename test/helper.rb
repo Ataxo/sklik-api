@@ -34,7 +34,7 @@ if ENV['TRAVIS'] == "yes"
   SklikApi.use_sandbox_for_test = false
 
   #disable logger
-  SklikApi.logger = nil
+  SklikApi.logger = false
 else
   SklikApi.logger = Logger.new('log/sklik_api_test.log')
 end

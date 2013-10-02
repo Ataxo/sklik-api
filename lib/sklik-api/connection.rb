@@ -9,22 +9,18 @@ class SklikApi
     }
 
     #prepare connection to sklik
-    def self.connection
-      Thread.current[:sklik_api] ||= {}
-      unless Thread.current[:sklik_api][:connection]
-        path = (SklikApi.use_sandbox_for_test? && (ENV['RACK_ENV'] || ENV['RAILS'] == "test")) ? "/sandbox/RPC2" : "/RPC2"
-        server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
-        server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
-        #fix of UTF-8 encoding
-        server.extend(XMLRPCWorkAround)
-        #debug mode to see what XMLRPC is doing
-        server.set_debug(File.open("log/xmlrpc-#{Time.now.strftime("%Y_%m_%d-%H_%M_%S")}.log","a:UTF-8")) if @args[:debug]
-        Thread.current[:sklik_api][:connection] = server
-      end
-      Thread.current[:sklik_api][:connection]
+    def connection
+      path = (SklikApi.use_sandbox_for_test? && (ENV['RACK_ENV'] || ENV['RAILS'] == "test")) ? "/sandbox/RPC2" : "/RPC2"
+      server = XMLRPC::Client.new3(:host => "api.sklik.cz", :path => path, :port => 443, :use_ssl => true, :timeout => @args[:timeout])
+      server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
+      #fix of UTF-8 encoding
+      server.extend(XMLRPCWorkAround)
+      #debug mode to see what XMLRPC is doing
+      server.set_debug(File.open("log/xmlrpc-#{Time.now.strftime("%Y_%m_%d-%H_%M_%S")}.log","a:UTF-8")) if @args[:debug]
+      server
     end
 
-    def reopen_connection!
+    def self.reopen_connection!
       Thread.current[:sklik_api] ||= {}
       Thread.current[:sklik_api][:connection] = nil
       connection
@@ -35,12 +31,7 @@ class SklikApi
     end
 
     def self.connection
-      @connection ||= SklikApi::Connection.new(:debug => false)
-    end
-
-    #prepare connection to sklik
-    def connection
-      self.class.connection
+      Thread.current[:sklik_api][:connection] ||= SklikApi::Connection.new(:debug => false)
     end
 
     #prepare connection to sklik
