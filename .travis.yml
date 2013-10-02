@@ -12,7 +12,7 @@ notifications:
     recipients:
       - ondrej@bartas.cz
 env:
-  travis: 'yes'
+  TRAVIS: 'yes'
 matrix:
   allow_failures:
     - rvm: jruby-19mode

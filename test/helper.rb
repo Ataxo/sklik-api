@@ -23,7 +23,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'sklik-api'
 require './test/fake_web'
 
-SklikApi.logger = Logger.new('log/sklik_api_test.log')
 
 #set test account for travis!
 if ENV['TRAVIS'] == "yes"
@@ -32,6 +31,8 @@ if ENV['TRAVIS'] == "yes"
       :password => "passwordfortravis"
     )
   SklikApi.use_sandbox_for_test= false
+else
+  SklikApi.logger = Logger.new('log/sklik_api_test.log')
 end
 
 class Test::Unit::TestCase
