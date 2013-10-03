@@ -7,7 +7,7 @@ gem "i18n"
 gem "activesupport"
 
 
-group :development do
+group :development, :test do
   gem 'shoulda-context'
   gem "turn", "~> 0.8.2"
   gem "ansi", "~> 1.2.5"
@@ -15,4 +15,5 @@ group :development do
   gem "fakeweb"
   gem "shotgun"
   gem "simplecov"
+  gem 'coveralls', require: false
 end

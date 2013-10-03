@@ -2,6 +2,9 @@ require 'rubygems'
 require 'bundler'
 require 'fakeweb'
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'simplecov'
 SimpleCov.start 'test_frameworks' do
 end
