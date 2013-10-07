@@ -46,7 +46,7 @@ Example of input hash
     end
 
     def uniq_identifier
-      "#{@args[:headline]}#{@args[:description1]}#{@args[:description2]}#{@args[:display_url]}#{@args[:url]}"
+      "#{@args[:headline]}#{@args[:description1]}#{@args[:description2]}#{@args[:display_url]}#{@args[:url].gsub("/", "")}"
     end
 
     def create_args
