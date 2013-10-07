@@ -380,6 +380,9 @@ Example of input hash
             #check status to be running
             (@new_adtexts.keys & @saved_adtexts.keys).each do |k|
               @saved_adtexts[k].restore if @saved_adtexts[k].args[:status] == :stopped
+
+              #if status is different than in new object - update it!
+              @saved_adtexts[k].update status: @new_adtexts[k].args[:status] if @saved_adtexts[k].args[:status] != @new_adtexts[k].args[:status]
             end
           end
         rescue Exception => e
