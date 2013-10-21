@@ -101,6 +101,7 @@ class SklikApi
 
       SklikApi.log(:debug, "Calling api: #{method} [#{args}]") unless method == "client.login"
       retry_count = MAX_RETRIES
+      retry_count_unavailable = MAX_RETRIES * 10
       begin
         #get response from sklik
         param = connection.call( method, get_session, *args ).symbolize_keys
@@ -114,8 +115,12 @@ class SklikApi
         elsif param[:status] == 204 #Already removed
           SklikApi.log(:info, "Trying to #{method} of #{args.inspect} but object is already in this status")
           return true
+        elsif param[:status] == 503
+          raise SklikApi::ServiceTemporarilyUnavailable, "Calling method: #{method} and service is unavailible"
         elsif param[:status] == 400
           raise SklikApi::InvalidArguments, "Calling method: #{method} with invalid arguments: #{args}, #{param.inspect}"
+        elsif param[:status] == 403
+          raise SklikApi::Forbidden, "Forbidden access to SklikApi"
         elsif param[:status] == 404
           raise SklikApi::NotFound, "Calling method: #{method} with params: #{args} was not found"
         elsif param[:status] == 406
@@ -132,6 +137,15 @@ class SklikApi
           reopen_connection!
           retry
         end
+
+        if e.is_a?(SklikApi::ServiceTemporarilyUnavailable) && retry_count_unavailable > 0
+          sleep_time = 5+Random.rand(10)
+          SklikApi.log(:info, "Service Temporarily Unavailable - sleeping for #{sleep_time}s and retrying")
+          sleep(sleep_time)
+          retry_count_unavailable -= 1
+          retry
+        end
+
         #when know exception which is not fault of sklik don't retry!
         raise e if e.class.name =~ /SklikApi::/
 
