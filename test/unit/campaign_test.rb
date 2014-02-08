@@ -17,14 +17,20 @@ class CampaignTest < Test::Unit::TestCase
     end
 
     should "return array of search services" do
-      assert_equal SklikApi::Campaign.list_search_services, [{:id=>1, :name=>"Vyhledávání na Seznam.cz"},
-               {:id=>2, :name=>"Firmy.cz"},
-               {:id=>3, :name=>"Sbazar.cz"},
-               {:id=>4, :name=>"Encyklopedie.Seznam.cz"},
-               {:id=>5, :name=>"Seznam na mobil (Smobil.cz)"},
-               {:id=>6, :name=>"Seznam Obrázky (Obrazky.cz)"},
-               {:id=>7, :name=>"Seznam Zboží (Zbozi.cz)"},
-               {:id=>8, :name=>"Partnerské vyhledávače"}]
+      assert_equal SklikApi::Campaign.list_search_services, [
+         {:id=>1, :name=>"Vyhledávání na Seznam.cz - PC"},
+         {:id=>11, :name=>"Vyhledávání na Seznam.cz - Tablet"},
+         {:id=>12, :name=>"Vyhledávání na Seznam.cz - Mobil"},
+         {:id=>20, :name=>"Vyhledávání na Seznam.cz (nové) - PC"},
+         {:id=>21, :name=>"Vyhledávání na Seznam.cz (nové) - Tablet"},
+         {:id=>22, :name=>"Vyhledávání na Seznam.cz (nové) - Mobil"},
+         {:id=>2, :name=>"Firmy.cz"},
+         {:id=>3, :name=>"Sbazar.cz"},
+         {:id=>4, :name=>"Encyklopedie.Seznam.cz"},
+         {:id=>5, :name=>"Seznam na mobil (Smobil.cz)"},
+         {:id=>6, :name=>"Seznam Obrázky (Obrazky.cz)"},
+         {:id=>7, :name=>"Seznam Zboží (Zbozi.cz)"},
+         {:id=>8, :name=>"Partnerské vyhledávače"}]
     end
 
     context "only campaign" do

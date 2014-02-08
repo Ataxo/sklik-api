@@ -382,7 +382,10 @@ Example of input hash
               @saved_adtexts[k].restore if @saved_adtexts[k].args[:status] == :stopped
 
               #if status is different than in new object - update it!
-              @saved_adtexts[k].update status: @new_adtexts[k].args[:status] if @saved_adtexts[k].args[:status] != @new_adtexts[k].args[:status]
+              if @saved_adtexts[k].args[:status] != @new_adtexts[k].args[:status] || @saved_adtexts[k].args[:url] != @new_adtexts[k].args[:url]
+                puts "updating adtext #{@saved_adtexts[k]} in #{@args[:name]} -> #{@new_adtexts[k].args[:status]} -> #{@new_adtexts[k].args[:url]}"
+                @saved_adtexts[k].update status: @new_adtexts[k].args[:status], url: @new_adtexts[k].args[:url]
+              end
             end
           end
         rescue Exception => e

@@ -26,7 +26,16 @@ class AdgroupIntegrationTest < Test::Unit::TestCase
         :cpc => 6.0,
         :campaign_id => @campaign.args[:campaign_id],
         :keywords => [],
-        :ads => [],
+        :ads => [
+          {
+            :headline => "Super headline",
+            :description1 => "Trying to do",
+            :description2 => "best description ever",
+            :display_url => "bartas.cz",
+            :url => "http://www.bartas.cz/",
+            :status => :running,
+          }
+        ],
         :status => :running,
       }
 
@@ -122,5 +131,38 @@ class AdgroupIntegrationTest < Test::Unit::TestCase
       assert_equal returned_hash.to_a.sort, adgroup_hash.to_a.sort
     end
 
+    should "update adgroup with specified Ads" do
+      adgroup_hash = {
+        :name => "my adgroup name - #{Time.now.strftime("%Y.%m.%d %H:%M:%S.%L")} - Testing ADS",
+        :cpc => 6.0,
+        :campaign_id => @campaign.args[:campaign_id],
+        :keywords => [
+          { :keyword => "[super kw]", :url => 'http://super.bartas.cz/', :cpc => 3.0},
+          { :keyword => "\"other kw\"", :url => 'http://mega.bartas.cz/', :cpc => 9.1}
+        ],
+        :ads => [
+          {
+            :headline => "Super headline",
+            :description1 => "Trying to do",
+            :description2 => "best description ever",
+            :display_url => "bartas.cz",
+            :url => "http://www.bartas.cz/?updated_url",
+            :status => :paused,
+          },
+          {
+            :headline => "Super headline - new",
+            :description1 => "Trying to do",
+            :description2 => "best description ever",
+            :display_url => "bartas.cz",
+            :url => "http://www.bartas.cz/",
+            :status => :running,
+          }
+        ],
+        :status => :running,
+      }
+      @adgroup.update(adgroup_hash)
+      adgroup = SklikApi::Adgroup.get(@adgroup.args[:adgroup_id]).to_hash
+      assert_equal adgroup.adtexts.size, 2
+    end
   end
 end

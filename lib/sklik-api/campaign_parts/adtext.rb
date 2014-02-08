@@ -46,13 +46,13 @@ Example of input hash
     end
 
     def uniq_identifier
-      "#{@args[:headline]}#{@args[:description1]}#{@args[:description2]}#{@args[:display_url]}#{@args[:url].gsub("/", "")}"
+      "#{@args[:headline]}#{@args[:description1]}#{@args[:description2]}#{@args[:display_url]}"
     end
 
     def create_args
       raise ArgumentError, "Adtexts need's to know adgroup_id" unless @args[:adgroup_id] || @adgroup.args[:adgroup_id]
       out = []
-      #add campaign id to know where to create adgroup
+      #add adgroup id to know where to create adgroup
       out << @args[:adgroup_id] || @adgroup.args[:adgroup_id]
 
       #add adtext struct
@@ -78,12 +78,15 @@ Example of input hash
     def update_args
       out = []
 
-      #add campaign id on which will be performed update
+      #add adtext id on which will be performed update
       out << @args[:adtext_id]
 
       #prepare campaign struct
       u_args = {}
       u_args[:status] = status_for_update if status_for_update
+
+      #add url for update
+      u_args[:clickthruUrl] = @args[:url]
 
       out << u_args
       ADDITIONAL_FIELDS.each do |add_info|

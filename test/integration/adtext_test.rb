@@ -38,7 +38,7 @@ class AdtextIntegrationTest < Test::Unit::TestCase
       @adtext_hash = {
         :adgroup_id => @adgroup.args[:adgroup_id],
         :headline => "Super headline",
-        :description1 => "Trying to do ",
+        :description1 => "Trying to do",
         :description2 => "best description ever",
         :display_url => "bartas.cz",
         :url => "http://www.bartas.cz/",
