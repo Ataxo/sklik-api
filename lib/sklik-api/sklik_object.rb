@@ -52,14 +52,23 @@ class SklikApi
 
       def restore
         begin
-          connection.call("#{self.class::NAME}.restore", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
+          out = connection.call("#{self.class::NAME}.restore", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
+          #change current status to current!
+          @args[:current_stauts] = @args[:status]
+
+          out
         rescue Exception => e
           raise e
         end
       end
 
       def remove
-        connection.call("#{self.class::NAME}.remove", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
+        out = connection.call("#{self.class::NAME}.remove", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
+
+        #change current status!
+        @args[:current_stauts] = :stopped
+
+        out
       end
 
       def create
@@ -96,6 +105,11 @@ class SklikApi
 
       def update_object
         out = connection.call("#{self.class::NAME}.setAttributes", *update_args ) { |param| true }
+
+        #if changed status update current status!
+        @args[:current_stauts] = @args[:status] if @args[:current_stauts] != @args[:status]
+
+        out
       end
 
       def create_args

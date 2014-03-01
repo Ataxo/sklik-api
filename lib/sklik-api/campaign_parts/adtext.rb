@@ -149,7 +149,8 @@ Example of input hash
         :description2 => adtext[:creative3],
         :display_url =>adtext[:clickthruText],
         :url => adtext[:clickthruUrl],
-        :status => fix_status(adtext)
+        :status => fix_status(adtext),
+        :current_status => fix_status(adtext),
       }
     end
 
@@ -183,7 +184,7 @@ Example of input hash
     end
 
     def get_current_status
-      self.class.get_current_status :adtext_id => @args[:adtext_id]
+      @args[:current_status] ||= self.class.get_current_status :adtext_id => @args[:adtext_id]
     end
 
     def valid?

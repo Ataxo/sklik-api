@@ -174,7 +174,8 @@ Example of input hash
         :adgroup_id => keyword[:groupId],
         :keyword_id => keyword[:id],
         :keyword => apply_math_type(keyword[:name], keyword[:matchType] ),
-        :status => fix_status(keyword)
+        :status => fix_status(keyword),
+        :current_status => fix_status(keyword),
       }
       ADDITIONAL_READ_FIELDS.each do |add_info|
         field_name = add_info.to_s.underscore.to_sym
@@ -218,7 +219,7 @@ Example of input hash
     end
 
     def get_current_status
-      self.class.get_current_status :keyword_id => @args[:keyword_id]
+      @args[:current_status] ||= self.class.get_current_status :keyword_id => @args[:keyword_id]
     end
 
     def update args = {}

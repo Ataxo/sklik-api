@@ -140,6 +140,7 @@ Example of input hash
         :cpc => adgroup[:cpc].to_f/100.0,
         :name => adgroup[:name],
         :status => fix_status(adgroup),
+        :current_status => fix_status(adgroup),
         :campaign_id => adgroup[:campaignId],
       }
     end
@@ -300,7 +301,7 @@ Example of input hash
     end
 
     def get_current_status
-      self.class.get_current_status :adgroup_id => @args[:adgroup_id], :customer_id => @customer_id
+      @args[:current_status] ||= self.class.get_current_status :adgroup_id => @args[:adgroup_id], :customer_id => @customer_id
     end
 
     def save

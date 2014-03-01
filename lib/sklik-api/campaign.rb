@@ -111,6 +111,7 @@ Example of input hash
         :budget => campaign[:dayBudget].to_f/100.0,
         :name => campaign[:name],
         :status => fix_status(campaign),
+        :current_status => fix_status(campaign),
         :excluded_search_services => campaign[:excludedSearchServices],
         :network_setting=> {:content=>campaign[:context], :search=>true}
       }
@@ -209,7 +210,7 @@ Example of input hash
     end
 
     def get_current_status
-      self.class.get_current_status :campaign_id => @args[:campaign_id], :customer_id => @customer_id
+      @args[:current_status] ||= self.class.get_current_status :campaign_id => @args[:campaign_id], :customer_id => @customer_id
     end
 
     def update args = {}
