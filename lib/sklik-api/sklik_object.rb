@@ -54,7 +54,7 @@ class SklikApi
         begin
           out = connection.call("#{self.class::NAME}.restore", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
           #change current status to current!
-          @args[:current_stauts] = @args[:status]
+          @args[:current_status] = @args[:status]
 
           out
         rescue Exception => e
@@ -66,7 +66,7 @@ class SklikApi
         out = connection.call("#{self.class::NAME}.remove", @args["#{self.class.to_s.downcase.split(":").last}_id".to_sym] ) { |param| true }
 
         #change current status!
-        @args[:current_stauts] = :stopped
+        @args[:current_status] = :stopped
 
         out
       end
