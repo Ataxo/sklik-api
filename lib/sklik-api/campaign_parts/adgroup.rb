@@ -232,7 +232,7 @@ Example of input hash
     end
 
     def adtexts
-      if @args[:adgroup_id] && get_current_status == :stopped
+      if @args[:adgroup_id] && get_current_status.to_sym == :stopped
         SklikApi.log :error, "Adgroup: #{@args[:adgroup_id]} - Can't get adtexts for stopped Adgroup!"
         []
       else
@@ -241,7 +241,7 @@ Example of input hash
     end
 
     def keywords
-      if @args[:adgroup_id] && get_current_status == :stopped
+      if @args[:adgroup_id] && get_current_status.to_sym == :stopped
         SklikApi.log :error, "Adgroup: #{@args[:adgroup_id]} - Can't get keywords for stopped Adgroup!"
         []
       else
@@ -311,7 +311,7 @@ Example of input hash
       if @args[:adgroup_id]  #do update
 
         #get current status of campaign
-        before_status = get_current_status
+        before_status = get_current_status.to_sym
 
         #restore campaign before update
         restore if before_status == :stopped

@@ -239,7 +239,7 @@ Example of input hash
       clear_errors
       if @args[:campaign_id]  #do update
         #get current status of campaign
-        before_status = get_current_status
+        before_status = get_current_status.to_sym
 
         #restore campaign before update
         restore if before_status == :stopped
